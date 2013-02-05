@@ -22,9 +22,7 @@ var sixpack = require("sixpack-client");
 
 ## Usage
 
-Check out the examples in the `examples` directory for some quick examples for how to use the library. When using in node they take two: an error and response.
-
-Here's a very basic example in node:
+Check out the examples in the `examples` directory for some quick examples for how to use the library. Here's a very basic example in node:
 
 ```js
 var sixpack = require('sixpack-client');
