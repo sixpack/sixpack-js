@@ -10,11 +10,11 @@ Include the "lib/sixpack.js" script. The `sixpack` object will be added to your 
 <script src="sixpack.js"></script>
 ```
 
-or if you're using sixpack-client with node.js
+If you're using sixpack-client with node.js start by installing it:
 
 	$ npm install sixpack-client
 
-Then require the "sixpack" module:
+then require the "sixpack-client" module:
 
 ``` javascript
 var sixpack = require("sixpack-client");
