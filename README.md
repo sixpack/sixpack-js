@@ -1,6 +1,6 @@
 # sixpack-client
 
-Node / Browser library for the SeatGeek's Sixpack AB testing framework.
+Node / Browser library for SeatGeek's Sixpack AB testing framework.
 
 ## Installation
 
