@@ -4,7 +4,7 @@ Node / Browser library for SeatGeek's Sixpack AB testing framework.
 
 ## Installation
 
-Include the "lib/sixpack.js" script. The `sixpack` object will be added to your environment. In the browser do the following:
+Include the "sixpack.js" script. The `sixpack` object will be added to your environment. In the browser do the following:
 
 ``` html
 <script src="sixpack.js"></script>

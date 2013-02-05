@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 
 describe("Sixpack", function () {
     it("should return an alternative for simple_participate", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
             if (err) throw err;
             expect(alt).to.match(/trolled/);
@@ -13,7 +13,7 @@ describe("Sixpack", function () {
     });
 
     it("should auto generate a client_id", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_participate("show_bieber", ["trolled", "not-trolled"], function(err, alt) {
             if (err) throw err;
             expect(alt).to.match(/trolled/);
@@ -22,7 +22,7 @@ describe("Sixpack", function () {
     });
 
     it("should return ok for simple_convert", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
             if (err) throw err;
             sixpack.simple_convert("show-bieber", "mike", function(err, alt) {
@@ -34,7 +34,7 @@ describe("Sixpack", function () {
     });
 
     it("should return ok for multiple converts", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
             if (err) throw err;
             sixpack.simple_convert("show-bieber", "mike", function(err, alt) {
@@ -50,7 +50,7 @@ describe("Sixpack", function () {
     });
 
     it("should not return ok for simple_convert with new id", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_convert("show-bieber", "unknown_id", function(err, alt) {
             // TODO should this be an err?
             if (err) throw err;
@@ -60,7 +60,7 @@ describe("Sixpack", function () {
     });
 
     it("should not return ok for simple_convert with new experiment", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_convert("show-blieber", "mike", function(err, alt) {
             // TODO should this be an err?
             if (err) throw err;
@@ -70,7 +70,7 @@ describe("Sixpack", function () {
     });
 
     it("should not allow bad experiment names", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_participate("%%", ["trolled", "not-trolled"], function(err, alt) {
             assert.equal(alt, null);
             expect(err).instanceof(Error);
@@ -79,7 +79,7 @@ describe("Sixpack", function () {
     });
 
     it("should not allow bad alternative names", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         sixpack.simple_participate("show-bieber", ["trolled"], function(err, alt) {
             assert.equal(alt, null);
             expect(err).instanceof(Error);
@@ -93,7 +93,7 @@ describe("Sixpack", function () {
     });
 
     it("should work without using the simple methods", function (done) {
-        var sixpack = require('../index');
+        var sixpack = require('../');
         var session = new sixpack.Session();
         session.convert("testing", function(err, res) {
             if (err) throw err;
