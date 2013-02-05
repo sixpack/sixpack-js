@@ -1,0 +1,21 @@
+{
+  "name": "sixpack-client",
+  "version": "0.0.1",
+  "description": "JS client for SeatGeek's Sixpack AB testing framework.",
+  "main": "sixpack.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/seatgeek/sixpack-js.git"
+  },
+  "author": "SeatGeek",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "b93b1adeb8793cc6e8638e7a3255e2e68886a846",
+  "devDependencies": {
+    "mocha": "~1.8.1",
+    "chai": "~1.5.0"
+  }
+}
