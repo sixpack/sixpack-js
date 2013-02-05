@@ -20,7 +20,7 @@ describe("Sixpack", function () {
         });
     });
 
-    it("should return ok for simple-convert", function (done) {
+    it("should return ok for simple_convert", function (done) {
         var sixpack = require('../index');
         sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
             if (err) throw err;
@@ -29,6 +29,42 @@ describe("Sixpack", function () {
                 expect(alt).to.equal("ok");
                 done();
             });
+        });
+    });
+
+    it("should return ok for multiple converts", function (done) {
+        var sixpack = require('../index');
+        sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
+            if (err) throw err;
+            sixpack.simple_convert("show-bieber", "mike", function(err, alt) {
+                if (err) throw err;
+                expect(alt).to.equal("ok");
+                sixpack.simple_convert("show-bieber", "mike", function(err, alt) {
+                    if (err) throw err;
+                    expect(alt).to.equal("ok");
+                    done();
+                });
+            });
+        });
+    });
+
+    it("should not return ok for simple_convert with new id", function (done) {
+        var sixpack = require('../index');
+        sixpack.simple_convert("show-bieber", "unknown_id", function(err, alt) {
+            // TODO should this be an err?
+            if (err) throw err;
+            expect(alt).to.equal("failed");
+            done();
+        });
+    });
+
+    it("should not return ok for simple_convert with new experiment", function (done) {
+        var sixpack = require('../index');
+        sixpack.simple_convert("show-blieber", "mike", function(err, alt) {
+            // TODO should this be an err?
+            if (err) throw err;
+            expect(alt).to.equal("failed");
+            done();
         });
     });
 });
