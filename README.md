@@ -12,7 +12,7 @@ Include the "lib/sixpack.js" script. The `sixpack` object will be added to your 
 
 or if you're using sixpack-client with node.js
 
-	$ npm -g install sixpack-client
+	$ npm install sixpack-client
 
 Then require the "sixpack" module:
 
