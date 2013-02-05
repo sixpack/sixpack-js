@@ -4,9 +4,11 @@
     <script type="text/javascript">
       function go() {
         var session = new sixpack.Session();
-        session.participate("test-exp", ["alt-one", "alt-two"], function (res) {
+        session.participate("test-exp", ["alt-one", "alt-two"], function (err, res) {
+          if (err) throw err;
           document.getElementById("participate").innerHTML = JSON.stringify(res);
-          session.convert("test-exp", function (res) {
+          session.convert("test-exp", function (err, res) {
+            if (err) throw err;
             document.getElementById("convert").innerHTML = JSON.stringify(res);
           });
         });

@@ -22,7 +22,7 @@ var sixpack = require("sixpack-client");
 
 ## Usage
 
-Check out the examples in the `examples` directory for some quick examples for how to use the library. Note that when using in the browser callbacks only take a single parameter: the response. When using in node they take two: an error and response.
+Check out the examples in the `examples` directory for some quick examples for how to use the library. When using in node they take two: an error and response.
 
 Here's a very basic example in node:
 
