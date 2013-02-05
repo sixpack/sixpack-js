@@ -17,9 +17,21 @@ or if you're using sixpack-client with node.js
 Then require the "sixpack" module:
 
 ``` javascript
-var sixpack = require("sixpack");
+var sixpack = require("sixpack-client");
 ```
 
 ## Usage
 
 Check out the examples in the `examples` directory for some quick examples for how to use the library. Note that when using in the browser callbacks only take a single parameter: the response. When using in node they take two: an error and response.
+
+Here's a very basic example in node:
+
+```js
+var sixpack = require('sixpack-client');
+
+var session = new sixpack.Session();
+session.participate("test-exp", ["alt-one", "alt-two"], function (err, res) {
+  if (err) throw err;
+  console.log(res);
+});
+```
