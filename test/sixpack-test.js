@@ -91,4 +91,36 @@ describe("Sixpack", function () {
             });
         });
     });
+
+    it("should work without using the simple methods", function (done) {
+        var sixpack = require('../index');
+        var session = new sixpack.Session();
+        session.convert("testing", function(err, res) {
+            if (err) throw err;
+            expect(res.status).equal("failed");
+
+            session.participate("testing", ["one", "two"], function(err, res) {
+                if (err) throw err;
+                var alt1 = res.alternative;
+                var old_id = session.client_id;
+                session.client_id = sixpack.generate_client_id();
+
+                session.convert("testing", function(err, res) {
+                    if (err) throw err;
+                    expect(res.status).equal("failed");
+
+                    session.participate("testing", ["one", "two"], function(err, res) {
+                        if (err) throw err;
+                        session.client_id = old_id;
+
+                        session.participate("testing", ["one", "two"], function(err, res) {
+                            if (err) throw err;
+                            expect(res.alternative).to.equal(alt1);
+                            done();
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
