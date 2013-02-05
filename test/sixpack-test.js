@@ -1,4 +1,5 @@
 var mocha  = require('mocha');
+var assert = require('chai').assert;
 var expect = require('chai').expect;
 
 describe("Sixpack", function () {
@@ -65,6 +66,29 @@ describe("Sixpack", function () {
             if (err) throw err;
             expect(alt).to.equal("failed");
             done();
+        });
+    });
+
+    it("should not allow bad experiment names", function (done) {
+        var sixpack = require('../index');
+        sixpack.simple_participate("%%", ["trolled", "not-trolled"], function(err, alt) {
+            assert.equal(alt, null);
+            expect(err).instanceof(Error);
+            done();
+        });
+    });
+
+    it("should not allow bad alternative names", function (done) {
+        var sixpack = require('../index');
+        sixpack.simple_participate("show-bieber", ["trolled"], function(err, alt) {
+            assert.equal(alt, null);
+            expect(err).instanceof(Error);
+
+            sixpack.simple_participate("show-bieber", ["trolled", "%%"], function(err, alt) {
+                assert.equal(alt, null);
+                expect(err).instanceof(Error);
+                done();
+            });
         });
     });
 });
