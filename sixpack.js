@@ -80,7 +80,14 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request("/participate", params, callback);
+            return _request("/participate", params, function(err, res) {
+                if (err) {
+                    res = {status: "failed",
+                           error: err,
+                           alternative: alternatives[0]};
+                }
+                return callback(null, res);
+            });
         },
         convert: function(experiment_name, callback) {
             var params = {client_id: this.client_id,
@@ -91,7 +98,13 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request("/convert", params, callback);
+            return _request("/convert", params, function(err, res) {
+                if (err) {
+                    res = {status: "failed",
+                           error: err};
+                }
+                return callback(null, res);
+            });
         }
     };
 
