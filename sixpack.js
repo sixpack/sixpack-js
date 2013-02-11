@@ -1,5 +1,5 @@
 (function () {
-    var sixpack = {host: "localhost", port: 5000};
+    var sixpack = {host: "localhost", port: 5000, ip_address: null, user_agent: null};
 
     // check for node module loader
     var on_node = false;
@@ -40,10 +40,12 @@
         });
     };
 
-    sixpack.Session = function (client_id, host, port) {
+    sixpack.Session = function (client_id, host, port, ip_address, user_agent) {
         this.client_id = client_id || sixpack.generate_client_id();
         this.host = host || sixpack.host;
         this.port = port || sixpack.port;
+        this.ip_address = ip_address || sixpack.ip_address;
+        this.user_agent = user_agent || sixpack.user_agent;
     };
 
     sixpack.Session.prototype = {
@@ -72,11 +74,23 @@
             if (force != null && _in_array(alternatives, force)) {
                 params.force = force;
             }
+            if (this.ip_address) {
+                params.ip_address = this.ip_address;
+            }
+            if (this.user_agent) {
+                params.user_agent = this.user_agent;
+            }
             return _request("/participate", params, callback);
         },
         convert: function(experiment_name, callback) {
             var params = {client_id: this.client_id,
                           experiment: experiment_name};
+            if (this.ip_address) {
+                params.ip_address = this.ip_address;
+            }
+            if (this.user_agent) {
+                params.user_agent = this.user_agent;
+            }
             return _request("/convert", params, callback);
         }
     };
