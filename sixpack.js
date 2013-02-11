@@ -98,11 +98,20 @@
     var counter = 0;
 
     var _request = function(endpoint, params, callback) {
+        var timed_out = false;
+        var timeout_handle = setTimeout(function () {
+            timed_out = true;
+            return callback(new Error("request timed out"));
+        }, 250);
+
         if (!on_node) {
             var cb = "callback" + (++counter);
             params.callback = "sixpack." + cb
             sixpack[cb] = function (res) {
-                return callback(null, res);
+                if (!timed_out) {
+                    clearTimeout(timeout_handle);
+                    return callback(null, res);
+                }
             }
         }
         var url = _request_uri(endpoint, params);
@@ -126,11 +135,17 @@
                     } else {
                         data = JSON.parse(body);
                     }
-                    return callback(null, data);
+                    if (!timed_out) {
+                        clearTimeout(timeout_handle);
+                        return callback(null, data);
+                    }
                 });
             });
             req.on('error', function(err) {
-                return callback(err);
+                if (!timed_out) {
+                    clearTimeout(timeout_handle);
+                    return callback(err);
+                }
             });
         }
     };
