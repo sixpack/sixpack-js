@@ -1,5 +1,5 @@
 (function () {
-    var sixpack = {host: "localhost", port: 5000, ip_address: null, user_agent: null};
+    var sixpack = {base_url: "http://localhost:5000", ip_address: null, user_agent: null};
 
     // check for node module loader
     var on_node = false;
@@ -40,10 +40,9 @@
         });
     };
 
-    sixpack.Session = function (client_id, host, port, ip_address, user_agent) {
+    sixpack.Session = function (client_id, base_url, ip_address, user_agent) {
         this.client_id = client_id || sixpack.generate_client_id();
-        this.host = host || sixpack.host;
-        this.port = port || sixpack.port;
+        this.base_url = base_url || sixpack.base_url;
         this.ip_address = ip_address || sixpack.ip_address;
         this.user_agent = user_agent || sixpack.user_agent;
     };
@@ -164,7 +163,7 @@
     };
 
     var _request_uri = function(endpoint, params) {
-        endpoint = "http://" + sixpack.host + ":" + sixpack.port + endpoint;
+        endpoint = sixpack.base_url + endpoint;
         var query_string = [];
         var e = encodeURIComponent;
         for (var key in params) {
