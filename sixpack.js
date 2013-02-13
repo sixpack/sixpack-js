@@ -82,7 +82,7 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request("/participate", params, function(err, res) {
+            return _request(this.base_url + "/participate", params, function(err, res) {
                 if (err) {
                     res = {status: "failed",
                            error: err,
@@ -100,7 +100,7 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request("/convert", params, function(err, res) {
+            return _request(this.base_url + "/convert", params, function(err, res) {
                 if (err) {
                     res = {status: "failed",
                            error: err};
@@ -112,7 +112,7 @@
 
     var counter = 0;
 
-    var _request = function(endpoint, params, callback) {
+    var _request = function(uri, params, callback) {
         var timed_out = false;
         var timeout_handle = setTimeout(function () {
             timed_out = true;
@@ -129,7 +129,7 @@
                 }
             }
         }
-        var url = _request_uri(endpoint, params);
+        var url = _request_uri(uri, params);
         if (!on_node) {
             script = document.createElement('script');
             script.type = 'text/javascript';
@@ -166,7 +166,6 @@
     };
 
     var _request_uri = function(endpoint, params) {
-        endpoint = sixpack.base_url + endpoint;
         var query_string = [];
         var e = encodeURIComponent;
         for (var key in params) {
