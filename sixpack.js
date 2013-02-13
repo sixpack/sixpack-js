@@ -21,7 +21,7 @@
 
         var session = new sixpack.Session(client_id);
         session.participate(experiment_name, alternatives, force, function (err, res) {
-            return callback(err, res && res.alternative);
+            return callback(err, res && res.alternative.name);
         });
     };
 
@@ -84,7 +84,7 @@
                 if (err) {
                     res = {status: "failed",
                            error: err,
-                           alternative: alternatives[0]};
+                           alternative: {name: alternatives[0]}};
                 }
                 return callback(null, res);
             });

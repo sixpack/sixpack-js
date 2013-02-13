@@ -101,7 +101,7 @@ describe("Sixpack", function () {
 
             session.participate("testing", ["one", "two"], function(err, res) {
                 if (err) throw err;
-                var alt1 = res.alternative;
+                var alt1 = res.alternative.name;
                 var old_id = session.client_id;
                 session.client_id = sixpack.generate_client_id();
 
@@ -115,7 +115,7 @@ describe("Sixpack", function () {
 
                         session.participate("testing", ["one", "two"], function(err, res) {
                             if (err) throw err;
-                            expect(res.alternative).to.equal(alt1);
+                            expect(res.alternative.name).to.equal(alt1);
                             done();
                         });
                     });
