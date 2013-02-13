@@ -45,6 +45,9 @@
         this.base_url = base_url || sixpack.base_url;
         this.ip_address = ip_address || sixpack.ip_address;
         this.user_agent = user_agent || sixpack.user_agent;
+        if (!on_node) {
+            this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
+        }
     };
 
     sixpack.Session.prototype = {
