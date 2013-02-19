@@ -73,6 +73,13 @@
             var params = {client_id: this.client_id,
                           experiment: experiment_name,
                           alternatives: alternatives};
+            if (!on_node && force == null) {
+                var regex = new RegExp("[\\?&]sixpack-force-" + experiment_name + "=([^&#]*)");
+                var results = regex.exec(window.location.search);
+                if(results != null) {
+                    force = decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+            }
             if (force != null && _in_array(alternatives, force)) {
                 params.force = force;
             }
