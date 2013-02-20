@@ -33,3 +33,11 @@ session.participate("test-exp", ["alt-one", "alt-two"], function (err, res) {
   console.log(res);
 });
 ```
+
+## Forcing an Alternative
+
+For debugging / design work it can be useful to force a page to load
+using a specific alternative. To force an alternative use the `force`
+parameter to `participate()`. If you're using sixpack.js in the
+browser you can also just include a query parameter,
+e.g. `/your-page?sixpack-force-EXPERIMENT_NAME=ALTERNATIVE_NAME`.
