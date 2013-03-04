@@ -124,7 +124,7 @@
         var timeout_handle = setTimeout(function () {
             timed_out = true;
             return callback(new Error("request timed out"));
-        }, 250);
+        }, 1000);
 
         if (!on_node) {
             var cb = "callback" + (++counter);
