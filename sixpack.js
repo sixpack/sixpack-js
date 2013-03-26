@@ -81,7 +81,7 @@
                 }
             }
             if (force != null && _in_array(alternatives, force)) {
-                params.force = force;
+                return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
             }
             if (this.ip_address) {
                 params.ip_address = this.ip_address;

@@ -12,6 +12,19 @@ describe("Sixpack", function () {
         });
     });
 
+    it("should return an alternative for simple_participate with force", function (done) {
+        var sixpack = require('../');
+        sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", "trolled", function(err, alt) {
+            if (err) throw err;
+            expect(alt).to.equal("trolled");
+            sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", "not-trolled", function(err, alt) {
+                if (err) throw err;
+                expect(alt).to.equal("not-trolled");
+                done();
+            });
+        });
+    });
+
     it("should auto generate a client_id", function (done) {
         var sixpack = require('../');
         sixpack.simple_participate("show_bieber", ["trolled", "not-trolled"], function(err, alt) {
