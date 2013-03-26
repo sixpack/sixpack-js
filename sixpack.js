@@ -99,6 +99,10 @@
             });
         },
         convert: function(experiment_name, callback) {
+            if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
+                return callback(new Error("Bad experiment_name"));
+            }
+
             var params = {client_id: this.client_id,
                           experiment: experiment_name};
             if (this.ip_address) {
