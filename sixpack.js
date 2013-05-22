@@ -81,7 +81,7 @@
                 }
             }
             if (force != null && _in_array(alternatives, force)) {
-                params.force = force;
+                return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
             }
             if (this.ip_address) {
                 params.ip_address = this.ip_address;
@@ -99,6 +99,10 @@
             });
         },
         convert: function(experiment_name, callback) {
+            if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
+                return callback(new Error("Bad experiment_name"));
+            }
+
             var params = {client_id: this.client_id,
                           experiment: experiment_name};
             if (this.ip_address) {
