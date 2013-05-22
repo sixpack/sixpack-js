@@ -1,6 +1,6 @@
 {
   "name": "sixpack-client",
-  "version": "0.1.3",
+  "version": "0.3.0",
   "description": "JS client for SeatGeek's Sixpack AB testing framework.",
   "main": "sixpack.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "author": "SeatGeek",
   "license": "MIT",
   "readmeFilename": "README.md",
-  "gitHead": "b93b1adeb8793cc6e8638e7a3255e2e68886a846",
+  "gitHead": "745feb999648782a7bccbceb1daecfc83af210d5",
   "devDependencies": {
     "mocha": "~1.8.1",
     "chai": "~1.5.0"
