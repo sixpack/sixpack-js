@@ -3,23 +3,25 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 
 describe("Sixpack", function () {
-    it("should return an alternative for simple_participate", function (done) {
+    it("should return an alternative for participate", function (done) {
         var sixpack = require('../');
-        sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
+        session = new sixpack.Session;
+        session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
             if (err) throw err;
-            expect(alt).to.match(/trolled/);
+            expect(resp.alternative.name).to.match(/trolled/);
             done();
         });
     });
 
-    it("should return an alternative for simple_participate with force", function (done) {
+    it("should return forced alternative for participate with force", function (done) {
         var sixpack = require('../');
-        sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", "trolled", function(err, alt) {
+        session = new sixpack.Session;
+        session.participate("show-bieber", ["trolled", "not-trolled"], "trolled", function(err, resp) {
             if (err) throw err;
-            expect(alt).to.equal("trolled");
-            sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", "not-trolled", function(err, alt) {
+            expect(resp.alternative.name).to.equal("trolled");
+            session.participate("show-bieber", ["trolled", "not-trolled"], "not-trolled", function(err, resp) {
                 if (err) throw err;
-                expect(alt).to.equal("not-trolled");
+                expect(resp.alternative.name).to.equal("not-trolled");
                 done();
             });
         });
@@ -27,20 +29,19 @@ describe("Sixpack", function () {
 
     it("should auto generate a client_id", function (done) {
         var sixpack = require('../');
-        sixpack.simple_participate("show_bieber", ["trolled", "not-trolled"], function(err, alt) {
-            if (err) throw err;
-            expect(alt).to.match(/trolled/);
-            done();
-        });
+        session = new sixpack.Session;
+        expect(session.client_id.length).to.equal(36);
+        done();
     });
 
-    it("should return ok for simple_convert", function (done) {
+    it("should return ok for convert", function (done) {
         var sixpack = require('../');
-        sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
+        session = new sixpack.Session("mike");
+        session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
             if (err) throw err;
-            sixpack.simple_convert("show-bieber", "mike", function(err, alt) {
+            session.convert("show-bieber", function(err, resp) {
                 if (err) throw err;
-                expect(alt).to.equal("ok");
+                expect(resp.status).to.equal("ok");
                 done();
             });
         });
@@ -48,43 +49,46 @@ describe("Sixpack", function () {
 
     it("should return ok for multiple converts", function (done) {
         var sixpack = require('../');
-        sixpack.simple_participate("show-bieber", ["trolled", "not-trolled"], "mike", function(err, alt) {
+        session = new sixpack.Session("mike");
+        session.participate("show-bieber", ["trolled", "not-trolled"], function(err, alt) {
             if (err) throw err;
-            sixpack.simple_convert("show-bieber", "mike", function(err, alt) {
+            session.convert("show-bieber", function(err, resp) {
                 if (err) throw err;
-                expect(alt).to.equal("ok");
-                sixpack.simple_convert("show-bieber", "mike", function(err, alt) {
+                expect(resp.status).to.equal("ok");
+                session.convert("show-bieber", function(err, alt) {
                     if (err) throw err;
-                    expect(alt).to.equal("ok");
+                    expect(resp.status).to.equal("ok");
                     done();
                 });
             });
         });
     });
 
-    it("should not return ok for simple_convert with new id", function (done) {
+    it("should not return ok for convert with new client_id", function (done) {
         var sixpack = require('../');
-        sixpack.simple_convert("show-bieber", "unknown_id", function(err, alt) {
-            // TODO should this be an err?
+        session = new sixpack.Session("unknown_idizzle")
+        session.convert("show-bieber", function(err, resp) {
             if (err) throw err;
-            expect(alt).to.equal("failed");
+            expect(resp.status).to.equal("failed");
             done();
         });
     });
 
-    it("should not return ok for simple_convert with new experiment", function (done) {
+    it("should not return ok for convert with new experiment", function (done) {
         var sixpack = require('../');
-        sixpack.simple_convert("show-blieber", "mike", function(err, alt) {
+        session = new sixpack.Session("mike");
+        session.convert("show-blieber", function(err, resp) {
             // TODO should this be an err?
             if (err) throw err;
-            expect(alt).to.equal("failed");
+            expect(resp.status).to.equal("failed");
             done();
         });
     });
 
     it("should not allow bad experiment names", function (done) {
         var sixpack = require('../');
-        sixpack.simple_participate("%%", ["trolled", "not-trolled"], function(err, alt) {
+        session = new sixpack.Session();
+        session.participate("%%", ["trolled", "not-trolled"], function(err, alt) {
             assert.equal(alt, null);
             expect(err).instanceof(Error);
             done();
@@ -93,11 +97,12 @@ describe("Sixpack", function () {
 
     it("should not allow bad alternative names", function (done) {
         var sixpack = require('../');
-        sixpack.simple_participate("show-bieber", ["trolled"], function(err, alt) {
+        session = new sixpack.Session();
+        session.participate("show-bieber", ["trolled"], function(err, alt) {
             assert.equal(alt, null);
             expect(err).instanceof(Error);
 
-            sixpack.simple_participate("show-bieber", ["trolled", "%%"], function(err, alt) {
+            session.participate("show-bieber", ["trolled", "%%"], function(err, alt) {
                 assert.equal(alt, null);
                 expect(err).instanceof(Error);
                 done();

@@ -10,28 +10,6 @@
         window["sixpack"] = sixpack;
     }
 
-    sixpack.simple_participate = function (experiment_name, alternatives, client_id, force, callback) {
-        if (typeof client_id === "function") {
-            callback = client_id;
-            client_id = null;
-        } else if (typeof force === "function") {
-            callback = force;
-            force = null;
-        }
-
-        var session = new sixpack.Session(client_id);
-        session.participate(experiment_name, alternatives, force, function (err, res) {
-            return callback(err, res && res.alternative.name);
-        });
-    };
-
-    sixpack.simple_convert = function (experiment_name, client_id, callback) {
-        var session = new sixpack.Session(client_id);
-        session.convert(experiment_name, function (err, res) {
-            return callback(err, res && res.status);
-        });
-    }
-
     sixpack.generate_client_id = function () {
         // from http://stackoverflow.com/questions/105034
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
