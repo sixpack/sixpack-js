@@ -1,6 +1,6 @@
 {
   "name": "sixpack-client",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "JS client for SeatGeek's Sixpack AB testing framework.",
   "main": "sixpack.js",
   "scripts": {
