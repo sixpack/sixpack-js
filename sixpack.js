@@ -76,13 +76,23 @@
                 return callback(null, res);
             });
         },
-        convert: function(experiment_name, callback) {
+        convert: function(experiment_name, kpi, callback) {
             if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
                 return callback(new Error("Bad experiment_name"));
             }
 
+            if (typeof kpi === "function") {
+                callback = kpi;
+                kpi = null;
+            }
+
             var params = {client_id: this.client_id,
                           experiment: experiment_name};
+            
+            if (kpi) {
+                params.kpi = kpi;
+            }
+
             if (this.ip_address) {
                 params.ip_address = this.ip_address;
             }
