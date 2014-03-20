@@ -47,6 +47,18 @@ describe("Sixpack", function () {
         });
     });
 
+    it("should return ok for convert with kpi", function (done) {
+        var sixpack = require('../');
+        session = new sixpack.Session("mike");
+        session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
+            if (err) throw err;
+            session.convert("show-bieber", "arrested", function(err, resp) {
+                if (err) throw err;
+                expect(resp.status).to.equal("ok");
+                done();
+            });
+        });
+    });
     it("should return ok for multiple converts", function (done) {
         var sixpack = require('../');
         session = new sixpack.Session("mike");
