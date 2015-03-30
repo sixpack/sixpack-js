@@ -77,9 +77,13 @@
                 return callback(null, res);
             });
         },
-        convert: function(experiment_name, callback) {
+        convert: function(experiment_name, kpi, callback) {
             if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
                 return callback(new Error("Bad experiment_name"));
+            }
+            if (typeof kpi === 'function') {
+                callback = kpi;
+                kpi = null;
             }
 
             var params = {client_id: this.client_id,
@@ -89,6 +93,9 @@
             }
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
+            }
+            if (kpi) {
+                params.kpi = kpi;
             }
             return _request(this.base_url + "/convert", params, this.timeout, function(err, res) {
                 if (err) {

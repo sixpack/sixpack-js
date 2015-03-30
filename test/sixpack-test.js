@@ -77,10 +77,20 @@ describe("Sixpack", function () {
     it("should not return ok for convert with new experiment", function (done) {
         var sixpack = require('../');
         session = new sixpack.Session("mike");
-        session.convert("show-blieber", function(err, resp) {
+        session.convert("show-bieber", function(err, resp) {
             // TODO should this be an err?
             if (err) throw err;
             expect(resp.status).to.equal("failed");
+            done();
+        });
+    });
+
+    it("should return ok for convert with kpi", function (done) {
+        var sixpack = require('../');
+        session = new sixpack.Session("mike");
+        session.convert("show-bieber", "justin-shown", function(err, resp) {
+            if (err) throw err;
+            expect(resp.status).to.equal("ok");
             done();
         });
     });
