@@ -30,7 +30,17 @@
     };
 
     sixpack.Session.prototype = {
-        participate: function(experiment_name, alternatives, force, callback) {
+        participate: function(experiment_name, alternatives, traffic_fraction, force, callback) {
+            if (typeof traffic_fraction === "function") {
+                callback = traffic_fraction;
+                traffic_fraction = null;
+                force = null;
+            }
+            else if (typeof traffic_fraction === "string") {
+                callback = force;
+                force = traffic_fraction;
+                traffic_fraction = null;
+            }
             if (typeof force === "function") {
                 callback = force;
                 force = null;
@@ -58,6 +68,9 @@
                 if(results != null) {
                     force = decodeURIComponent(results[1].replace(/\+/g, " "));
                 }
+            }
+            if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
+                params.traffic_fraction = traffic_fraction;
             }
             if (force != null && _in_array(alternatives, force)) {
                 return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
