@@ -1,5 +1,5 @@
 (function () {
-    var sixpack = {base_url: "http://localhost:5000", ip_address: null, user_agent: null};
+    var sixpack = {base_url: "http://localhost:5000", ip_address: null, user_agent: null, timeout: 1000};
 
     // check for node module loader
     var on_node = false;
@@ -18,7 +18,7 @@
         });
     };
 
-    sixpack.Session = function (client_id, base_url, ip_address, user_agent) {
+    sixpack.Session = function (client_id, base_url, ip_address, user_agent, timeout) {
         this.client_id = client_id || sixpack.generate_client_id();
         this.base_url = base_url || sixpack.base_url;
         this.ip_address = ip_address || sixpack.ip_address;
@@ -70,7 +70,7 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request(this.base_url + "/participate", params, function(err, res) {
+            return _request(this.base_url + "/participate", params, this.timeout, function(err, res) {
                 if (err) {
                     res = {status: "failed",
                         error: err,
@@ -92,7 +92,7 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request(this.base_url + "/convert", params, function(err, res) {
+            return _request(this.base_url + "/convert", params, this.timeout, function(err, res) {
                 if (err) {
                     res = {status: "failed",
                         error: err};
@@ -104,12 +104,12 @@
 
     var counter = 0;
 
-    var _request = function(uri, params, callback) {
+    var _request = function(uri, params, timeout, callback) {
         var timed_out = false;
         var timeout_handle = setTimeout(function () {
             timed_out = true;
             return callback(new Error("request timed out"));
-        }, 1000);
+        }, timeout);
 
         if (!on_node) {
             var cb = "callback" + (++counter);
