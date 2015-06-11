@@ -26,6 +26,7 @@
         if (!on_node) {
             this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
         }
+        this.timeout = timeout || sixpack.timeout;
     };
 
     sixpack.Session.prototype = {
