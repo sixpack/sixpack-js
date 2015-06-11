@@ -1,5 +1,5 @@
 (function () {
-    var sixpack = {base_url: "http://localhost:5000", ip_address: null, user_agent: null, timeout: 1000};
+    var sixpack = {base_url: "http://localhost:5000", ip_address: null, user_agent: null};
 
     // check for node module loader
     var on_node = false;
@@ -18,7 +18,7 @@
         });
     };
 
-    sixpack.Session = function (client_id, base_url, ip_address, user_agent, timeout) {
+    sixpack.Session = function (client_id, base_url, ip_address, user_agent) {
         this.client_id = client_id || sixpack.generate_client_id();
         this.base_url = base_url || sixpack.base_url;
         this.ip_address = ip_address || sixpack.ip_address;
@@ -26,11 +26,10 @@
         if (!on_node) {
             this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
         }
-        this.timeout = timeout || sixpack.timeout;
     };
 
     sixpack.Session.prototype = {
-        participate: function(experiment_name, alternatives, force, callback) {
+        participate: function(experiment_name, alternatives, force, record_force, callback) {
             if (typeof force === "function") {
                 callback = force;
                 force = null;
@@ -50,8 +49,11 @@
                 }
             }
             var params = {client_id: this.client_id,
-                          experiment: experiment_name,
-                          alternatives: alternatives};
+                experiment: experiment_name,
+                alternatives: alternatives,
+                force: force,
+                record_force: record_force
+            };
             if (!on_node && force == null) {
                 var regex = new RegExp("[\\?&]sixpack-force-" + experiment_name + "=([^&#]*)");
                 var results = regex.exec(window.location.search);
@@ -59,7 +61,7 @@
                     force = decodeURIComponent(results[1].replace(/\+/g, " "));
                 }
             }
-            if (force != null && _in_array(alternatives, force)) {
+            if (force != null && _in_array(alternatives, force) && !record_force) {
                 return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
             }
             if (this.ip_address) {
@@ -68,11 +70,11 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request(this.base_url + "/participate", params, this.timeout, function(err, res) {
+            return _request(this.base_url + "/participate", params, function(err, res) {
                 if (err) {
                     res = {status: "failed",
-                           error: err,
-                           alternative: {name: alternatives[0]}};
+                        error: err,
+                        alternative: {name: alternatives[0]}};
                 }
                 return callback(null, res);
             });
@@ -83,17 +85,17 @@
             }
 
             var params = {client_id: this.client_id,
-                          experiment: experiment_name};
+                experiment: experiment_name};
             if (this.ip_address) {
                 params.ip_address = this.ip_address;
             }
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request(this.base_url + "/convert", params, this.timeout, function(err, res) {
+            return _request(this.base_url + "/convert", params, function(err, res) {
                 if (err) {
                     res = {status: "failed",
-                           error: err};
+                        error: err};
                 }
                 return callback(null, res);
             });
@@ -102,12 +104,12 @@
 
     var counter = 0;
 
-    var _request = function(uri, params, timeout, callback) {
+    var _request = function(uri, params, callback) {
         var timed_out = false;
         var timeout_handle = setTimeout(function () {
             timed_out = true;
             return callback(new Error("request timed out"));
-        }, timeout);
+        }, 1000);
 
         if (!on_node) {
             var cb = "callback" + (++counter);
