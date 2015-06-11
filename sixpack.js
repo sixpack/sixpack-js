@@ -30,7 +30,7 @@
     };
 
     sixpack.Session.prototype = {
-        participate: function(experiment_name, alternatives, force, callback) {
+        participate: function(experiment_name, alternatives, force, record_force, callback) {
             if (typeof force === "function") {
                 callback = force;
                 force = null;
@@ -50,8 +50,11 @@
                 }
             }
             var params = {client_id: this.client_id,
-                          experiment: experiment_name,
-                          alternatives: alternatives};
+                experiment: experiment_name,
+                alternatives: alternatives,
+                force: force,
+                record_force: record_force
+            };
             if (!on_node && force == null) {
                 var regex = new RegExp("[\\?&]sixpack-force-" + experiment_name + "=([^&#]*)");
                 var results = regex.exec(window.location.search);
@@ -59,7 +62,7 @@
                     force = decodeURIComponent(results[1].replace(/\+/g, " "));
                 }
             }
-            if (force != null && _in_array(alternatives, force)) {
+            if (force != null && _in_array(alternatives, force) && !record_force) {
                 return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
             }
             if (this.ip_address) {
@@ -71,8 +74,8 @@
             return _request(this.base_url + "/participate", params, this.timeout, function(err, res) {
                 if (err) {
                     res = {status: "failed",
-                           error: err,
-                           alternative: {name: alternatives[0]}};
+                        error: err,
+                        alternative: {name: alternatives[0]}};
                 }
                 return callback(null, res);
             });
@@ -83,7 +86,7 @@
             }
 
             var params = {client_id: this.client_id,
-                          experiment: experiment_name};
+                experiment: experiment_name};
             if (this.ip_address) {
                 params.ip_address = this.ip_address;
             }
@@ -93,7 +96,7 @@
             return _request(this.base_url + "/convert", params, this.timeout, function(err, res) {
                 if (err) {
                     res = {status: "failed",
-                           error: err};
+                        error: err};
                 }
                 return callback(null, res);
             });
