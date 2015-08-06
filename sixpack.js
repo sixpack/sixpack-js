@@ -30,7 +30,17 @@
     };
 
     sixpack.Session.prototype = {
-        participate: function(experiment_name, alternatives, force, callback) {
+        participate: function(experiment_name, alternatives, traffic_fraction, force, callback) {
+            if (typeof traffic_fraction === "function") {
+                callback = traffic_fraction;
+                traffic_fraction = null;
+                force = null;
+            }
+            else if (typeof traffic_fraction === "string") {
+                callback = force;
+                force = traffic_fraction;
+                traffic_fraction = null;
+            }
             if (typeof force === "function") {
                 callback = force;
                 force = null;
@@ -59,6 +69,9 @@
                     force = decodeURIComponent(results[1].replace(/\+/g, " "));
                 }
             }
+            if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
+                params.traffic_fraction = traffic_fraction;
+            }
             if (force != null && _in_array(alternatives, force)) {
                 return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
             }
@@ -77,7 +90,11 @@
                 return callback(null, res);
             });
         },
-        convert: function(experiment_name, callback) {
+        convert: function(experiment_name, kpi, callback) {
+            if (typeof kpi === 'function') {
+                callback = kpi;
+                kpi = null;
+            }
             if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
                 return callback(new Error("Bad experiment_name"));
             }
@@ -89,6 +106,9 @@
             }
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
+            }
+            if (kpi) {
+                params.kpi = kpi;
             }
             return _request(this.base_url + "/convert", params, this.timeout, function(err, res) {
                 if (err) {
