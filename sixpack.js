@@ -18,15 +18,16 @@
         });
     };
 
-    sixpack.Session = function (client_id, base_url, ip_address, user_agent, timeout) {
-        this.client_id = client_id || sixpack.generate_client_id();
-        this.base_url = base_url || sixpack.base_url;
-        this.ip_address = ip_address || sixpack.ip_address;
-        this.user_agent = user_agent || sixpack.user_agent;
+    sixpack.Session = function (options) {
+        options = options || {};
+        this.client_id = options.client_id || sixpack.generate_client_id();
+        this.base_url = options.base_url || sixpack.base_url;
+        this.ip_address = options.ip_addess || sixpack.ip_address;
+        this.user_agent = options.user_agent || sixpack.user_agent;
         if (!on_node) {
             this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
         }
-        this.timeout = timeout || sixpack.timeout;
+        this.timeout = options.timeout || sixpack.timeout;
     };
 
     sixpack.Session.prototype = {
