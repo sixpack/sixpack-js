@@ -42,7 +42,7 @@ session.participate("test-exp", ["alt-one", "alt-two"], function (err, res) {
 When instantiating the session object you can pass optional params `client_id`, `base_url`, `ip_address`, `user_agent`
 
 ```js
-var sixpack = new sixpack.Session(12345, 'http://google.com/sixpack', '1.2.2.1', 'ChromeBot');
+var sixpack = new sixpack.Session({client_id: 12345, base_url: 'http://google.com/sixpack', ip_address: '1.2.2.1', user_agent: 'ChromeBot'});
 ```
 
 Client ID is a previously generated client id that you've previously stored. IP Address and User Agent are used for bot detection.
