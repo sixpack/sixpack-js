@@ -2,7 +2,13 @@
     // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
     Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
 
-    var sixpack = {base_url: "http://localhost:5000", ip_address: null, user_agent: null, timeout: 1000};
+    var sixpack = {
+        base_url: "http://localhost:5000",
+        ip_address: null,
+        user_agent: null,
+        timeout: 1000,
+        persist: false
+    };
 
     // check for node module loader
     var on_node = false;
@@ -13,18 +19,31 @@
         window["sixpack"] = sixpack;
     }
 
-    sixpack.generate_client_id = function () {
+    sixpack.generate_client_id = function (persist) {
         // from http://stackoverflow.com/questions/105034
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var client_id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
             return v.toString(16);
         });
+        if (!on_node && persist) {
+            document.cookie = persist + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+        }
+        return client_id;
     };
+
+    sixpack.get_persisted_client_id = function() {
+      var cookie_regexp = new RegExp("/(?:(?:^|.*;\s*)" + this.persist + "\s*\=\s*([^;]*).*$)|^.*$/"),
+      client_id = document.cookie.replace(cookie_regexp, "$1");
+      if (client_id === "") {
+        return undefined;
+      }
+      return client_id;
+    }
 
     sixpack.Session = function (options) {
         Object.assign(this, sixpack, options);
         if (!this.client_id) {
-            this.client_id = this.generate_client_id();
+            this.client_id = this.generate_client_id(this.persist);
         }
         if (!on_node) {
             this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
