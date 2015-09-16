@@ -1,4 +1,8 @@
 (function () {
+
+    // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
+    Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
+
     var sixpack = {base_url: "http://localhost:5000", ip_address: null, user_agent: null, timeout: 1000};
 
     // check for node module loader
@@ -19,15 +23,13 @@
     };
 
     sixpack.Session = function (options) {
-        options = options || {};
-        this.client_id = options.client_id || sixpack.generate_client_id();
-        this.base_url = options.base_url || sixpack.base_url;
-        this.ip_address = options.ip_addess || sixpack.ip_address;
-        this.user_agent = options.user_agent || sixpack.user_agent;
+        Object.assign(this, sixpack, options);
+        if(!this.client_id) {
+          this.client_id = this.generate_client_id();
+        }
         if (!on_node) {
             this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
         }
-        this.timeout = options.timeout || sixpack.timeout;
     };
 
     sixpack.Session.prototype = {
