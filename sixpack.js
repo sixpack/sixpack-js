@@ -1,5 +1,4 @@
 (function () {
-
     // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
     Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
 
@@ -24,8 +23,8 @@
 
     sixpack.Session = function (options) {
         Object.assign(this, sixpack, options);
-        if(!this.client_id) {
-          this.client_id = this.generate_client_id();
+        if (!this.client_id) {
+            this.client_id = this.generate_client_id();
         }
         if (!on_node) {
             this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
