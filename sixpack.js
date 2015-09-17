@@ -19,19 +19,19 @@
         window["sixpack"] = sixpack;
     }
 
-    sixpack.generate_client_id = function (persist) {
+    sixpack.generate_client_id = function () {
         // from http://stackoverflow.com/questions/105034
         var client_id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
             return v.toString(16);
         });
-        if (!on_node && persist) {
-            document.cookie = persist + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+        if (!on_node && this.persist) {
+            document.cookie = this.persist + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
         }
         return client_id;
     };
 
-    sixpack.get_persisted_client_id = function() {
+    sixpack.persisted_client_id = function() {
       var cookie_regexp = new RegExp("/(?:(?:^|.*;\s*)" + this.persist + "\s*\=\s*([^;]*).*$)|^.*$/"),
       client_id = document.cookie.replace(cookie_regexp, "$1");
       if (client_id === "") {
@@ -42,8 +42,13 @@
 
     sixpack.Session = function (options) {
         Object.assign(this, sixpack, options);
+
         if (!this.client_id) {
-            this.client_id = this.generate_client_id(this.persist);
+            if (this.persist && !on_node) {
+                this.client_id = this.persisted_client_id() || this.generate_client_id();
+            } else {
+                this.client_id = this.generate_client_id();
+            }
         }
         if (!on_node) {
             this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
