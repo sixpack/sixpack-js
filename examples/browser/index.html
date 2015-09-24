@@ -2,24 +2,29 @@
   <head>
     <script src="../../sixpack.js" type="text/javascript"></script>
     <script type="text/javascript">
-      function go() {
-        var session = new sixpack.Session();
-        session.participate("test-exp", ["alt-one", "alt-two"], function (err, res) {
+      var session = new sixpack.Session();
+
+      function participate() {
+        session.participate("test-exp", ["alt-one", "alt-two"],function (err, res) {
           if (err) throw err;
           document.getElementById("participate").innerHTML = JSON.stringify(res);
-          session.convert("test-exp", function (err, res) {
-            if (err) throw err;
-            document.getElementById("convert").innerHTML = JSON.stringify(res);
-          });
+        });
+      }
+
+      function convert() {
+        session.convert("test-exp", function (err, res) {
+          if (err) throw err;
+          document.getElementById("convert").innerHTML = JSON.stringify(res);
         });
       }
     </script>
   </head>
-  <body onload="go();">
+  <body onload="participate();">
     <h1>Sixpack</h1>
     <p>Response for participate:</p>
     <code><pre id="participate"></pre></code>
     <p>Response for convert:</p>
     <code><pre id="convert"></pre></code>
+    <button onClick="convert();">Convert!</button>
   </body>
 </html>
