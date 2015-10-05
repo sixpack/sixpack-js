@@ -10,6 +10,10 @@ Include the "sixpack.js" script. The `sixpack` object will be added to your envi
 <script src="sixpack.js"></script>
 ```
 
+If you're using bower start by installing it:
+
+	$ bower install sixpack-client
+
 If you're using sixpack-client with node.js start by installing it:
 
 	$ npm install sixpack-client
