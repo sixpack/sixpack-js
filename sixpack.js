@@ -32,12 +32,9 @@
     };
 
     sixpack.persisted_client_id = function() {
-      var cookie_regexp = new RegExp("/(?:(?:^|.*;\s*)" + this.persist + "\s*\=\s*([^;]*).*$)|^.*$/"),
-      client_id = document.cookie.replace(cookie_regexp, "$1");
-      if (client_id === "") {
-        return undefined;
-      }
-      return client_id;
+        // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
+        var result;
+        return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.persist) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
     }
 
     sixpack.Session = function (options) {
