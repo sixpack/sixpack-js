@@ -42,7 +42,8 @@
 
         if (!this.client_id) {
             if (this.persist && !on_node) {
-                this.client_id = this.persisted_client_id() || this.generate_client_id();
+                var persisted_id = this.persisted_client_id();
+                this.client_id = persisted_id !== null ? persisted_id : this.generate_client_id();
             } else {
                 this.client_id = this.generate_client_id();
             }
