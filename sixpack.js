@@ -97,6 +97,15 @@
                 callback = kpi;
                 kpi = null;
             }
+
+            if (!callback) {
+                callback = function(err) {
+                    if (err && console && console.error) {
+                        console.error(err);
+                    }
+                }
+            }
+
             if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
                 return callback(new Error("Bad experiment_name"));
             }
