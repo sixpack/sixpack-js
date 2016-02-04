@@ -177,4 +177,33 @@ describe("Sixpack", function () {
             });
         });
     });
+
+    it("should return an error when experiment_name is incorrect", function (done) {
+        var sixpack = require('../');
+        var session = new sixpack.Session({client_id: "mike"});
+
+        session.participate(undefined, ["trolled", "not-trolled"], function(err, resp) {
+            expect(err).to.be.an.instanceof(Error);
+            expect(err.message).to.equal("Bad experiment_name");
+
+            session.convert(undefined, function(err, resp) {
+                expect(err).to.be.an.instanceof(Error);
+                expect(err.message).to.equal("Bad experiment_name");
+                done();
+            });
+        });
+    });
+
+    it("should throw an error when callback is undefined", function (done) {
+        var sixpack = require('../');
+        var session = new sixpack.Session({client_id: "mike"});
+
+        expect(function() {
+            session.participate("show-bieber", ["trolled", "not-trolled"]);
+        }).to.throw(
+            Error, /^Callback is not specified$/
+        );
+
+        done();
+    });
 });
