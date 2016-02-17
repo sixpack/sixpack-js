@@ -10,11 +10,10 @@
         persist: true
     };
 
-    // check for node module loader
+    // check if on node, else expose on browser's global window object
     var on_node = false;
-    if (typeof module !== "undefined" && typeof require !== "undefined") {
+    if (typeof window === "undefined") {
         on_node = true;
-        module.exports = sixpack;
     } else {
         window["sixpack"] = sixpack;
     }
@@ -240,4 +239,9 @@
         }
         return false;
     };
+
+    // export module for node or environments with module loaders, such as webpack
+    if (typeof module !== "undefined" && typeof require !== "undefined") {
+        module.exports = sixpack;
+    }
 })();
