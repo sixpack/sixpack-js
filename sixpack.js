@@ -7,7 +7,9 @@
         ip_address: null,
         user_agent: null,
         timeout: 1000,
-        persist: true
+        persist: true,
+        cookie_name: "sixpack_client_id",
+        cookie_domain: null
     };
 
     // check if on node, else expose on browser's global window object
@@ -25,7 +27,11 @@
             return v.toString(16);
         });
         if (!on_node && this.persist) {
-            document.cookie = "sixpack_client_id=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+            var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+            if (this.cookie_domain) {
+              cookie_value += '; domain=' + this.cookie_domain;
+            }
+            document.cookie = cookie_value;
         }
         return client_id;
     };
@@ -33,7 +39,7 @@
     sixpack.persisted_client_id = function() {
         // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
         var result;
-        return (result = new RegExp('(?:^|; )' + encodeURIComponent('sixpack_client_id') + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
+        return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.cookie_name) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
     }
 
     sixpack.Session = function (options) {
