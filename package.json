@@ -1,21 +1,22 @@
 {
-  "name": "sixpack-client",
-  "version": "2.1.0",
-  "description": "JS client for SeatGeek's Sixpack AB testing framework.",
-  "main": "sixpack.js",
+  "name": "@azure-iot/sixpack-js",
+  "version": "1.0.0-rc.0",
+  "description": "Azure-IoT fork of the JS client for SeatGeek's Sixpack AB testing framework.",
+  "main": "./sixpack.js",
+  "license": "MIT",
+  "author": "SeatGeek",
+  "contributors": [
+    "Hunter Gatewood <hgatewood@gmail.com> (https://hcgatewood.github.com/about)"
+  ],
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --reporter spec"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/seatgeek/sixpack-js.git"
+    "url": "https://github.com/Azure/azure-iot-library.git"
   },
-  "author": "SeatGeek",
-  "license": "MIT",
-  "readmeFilename": "README.md",
-  "gitHead": "442fafd22f38396e4cba7030cc18dbc93dd1d018",
   "devDependencies": {
-    "mocha": "~1.8.1",
-    "chai": "~1.5.0"
+    "chai": "^1.5.0",
+    "mocha": "^1.8.1"
   }
 }

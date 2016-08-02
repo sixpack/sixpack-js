@@ -9,7 +9,9 @@
         timeout: 1000,
         persist: true,
         cookie_name: "sixpack_client_id",
-        cookie_domain: null
+        cookie_domain: null,
+        ignore_alternates_warning: null,
+        force_json: null
     };
 
     // check if on node, else expose on browser's global window object
@@ -83,7 +85,7 @@
                 return callback(new Error("Bad experiment_name"));
             }
 
-            if (alternatives.length < 2) {
+            if (alternatives.length < 2 && this.ignore_alternates_warning !== true) {
                 return callback(new Error("Must specify at least 2 alternatives"));
             }
 
@@ -182,7 +184,7 @@
             }
         }
         var url = _request_uri(uri, params);
-        if (!on_node) {
+        if (!on_node && this.force_json !== true) {
             script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = url;

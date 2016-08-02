@@ -1,6 +1,6 @@
-.DS_Store
-/node_modules/
-/test/
-/.gitignore
-/.npmignore
-/npm-debug.log
+# Dev
+test/
+gulpfile.js
+
+# Ignore files
+.npmignore
