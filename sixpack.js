@@ -10,8 +10,7 @@
         persist: true,
         cookie_name: "sixpack_client_id",
         cookie_domain: null,
-        ignore_alternates_warning: null,
-        force_json: null
+        ignore_alternates_warning: null
     };
 
     // check if on node, else expose on browser's global window object
@@ -184,7 +183,7 @@
             }
         }
         var url = _request_uri(uri, params);
-        if (!on_node && this.force_json !== true) {
+        if (!on_node) {
             script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = url;

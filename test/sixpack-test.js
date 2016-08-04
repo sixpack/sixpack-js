@@ -9,6 +9,9 @@ describe("Sixpack", function () {
     beforeEach( () => {
         sixpack = require('../');
         session = new sixpack.Session();
+
+        // Override default base_url when the SIXPACK_BASE_URL
+        // environment variable is found.
         if (process.env.SIXPACK_BASE_URL) {
             session.base_url = process.env.SIXPACK_BASE_URL;
         }
@@ -62,6 +65,7 @@ describe("Sixpack", function () {
     });
 
     it("should return ok for convert", function (done) {
+        session.client_id = "mike";
         session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
             if (err) throw err;
             session.convert("show-bieber", function(err, resp) {
@@ -73,6 +77,7 @@ describe("Sixpack", function () {
     });
 
     it("should return ok for multiple converts", function (done) {
+        session.client_id = "mike";
         session.participate("show-bieber", ["trolled", "not-trolled"], function(err, alt) {
             if (err) throw err;
             session.convert("show-bieber", function(err, resp) {
@@ -88,7 +93,19 @@ describe("Sixpack", function () {
     });
 
     it("should not return ok for convert with new client_id", function (done) {
+        session.client_id = "unknown_idizzle";
         session.convert("show-bieber", function(err, resp) {
+            if (err) throw err;
+            expect(resp.status).to.equal("failed");
+            done();
+        });
+    });
+
+    it("should not return ok for convert with new experiment", function (done) {
+        var sixpack = require('../');
+        var session = new sixpack.Session({client_id: "mike"});
+        session.convert("show-blieber", function(err, resp) {
+            // TODO should this be an err?
             if (err) throw err;
             expect(resp.status).to.equal("failed");
             done();
@@ -183,14 +200,14 @@ describe("Sixpack", function () {
     it("should not throw an error if the alternates warning is overridden", function (done) {
         session.ignore_alternates_warning = true;
         session.participate("testing", [], function(err, resp) {
-            if (err) throw err;
+            expect(err).to.be.null;
             done();
         });
     });
 
     it("should throw an error if the alternates warning is not overridden", function (done) {
         session.participate("testing", [], function(err, resp) {
-            if (! err) throw new Error('Failed to throw error');
+            expect(err.message).to.match(/^Must specify at least 2 alternatives$/);
             done();
         });
     });
