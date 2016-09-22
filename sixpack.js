@@ -191,7 +191,11 @@
             document.body.appendChild(script);
         } else {
             var http = require('http');
-            var req = http.get(url, function(res) {
+            var https = require('https');
+            var is_http = !!url.match("https:")
+            var protocol = (is_http ? http : https);
+
+            var req = protocol.get(url, function(res) {
                 var body = "";
                 res.on('data', function(chunk) {
                     return body += chunk;
