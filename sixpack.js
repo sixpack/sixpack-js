@@ -192,8 +192,8 @@
         } else {
             var http = require('http');
             var https = require('https');
-            var is_http = !!url.match("https:")
-            var protocol = (is_http ? http : https);
+            var is_https = !!url.match("https:")
+            var protocol = (is_https ? https : http);
 
             var req = protocol.get(url, function(res) {
                 var body = "";
