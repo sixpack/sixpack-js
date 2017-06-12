@@ -191,7 +191,11 @@
             document.body.appendChild(script);
         } else {
             var http = require('http');
-            var req = http.get(url, function(res) {
+            var https = require('https');
+            var is_https = !!url.match("https:")
+            var protocol = (is_https ? https : http);
+
+            var req = protocol.get(url, function(res) {
                 var body = "";
                 res.on('data', function(chunk) {
                     return body += chunk;
@@ -201,7 +205,7 @@
                     if (res.statusCode == 500) {
                         data = {status: "failed", response: body};
                     } else {
-                        data = JSON.parse(body);
+                        data = _parse_response(body);  
                     }
                     if (!timed_out) {
                         clearTimeout(timeout_handle);
@@ -250,5 +254,13 @@
     // export module for node or environments with module loaders, such as webpack
     if (typeof module !== "undefined" && typeof require !== "undefined") {
         module.exports = sixpack;
+    }
+
+    var _parse_response = function(response) {
+        try {
+            return JSON.parse(response);
+        } catch(e) {
+            return {status: "failed", response: "Unable to parse response"};
+        }
     }
 })();
