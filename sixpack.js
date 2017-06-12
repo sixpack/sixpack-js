@@ -205,7 +205,7 @@
                     if (res.statusCode == 500) {
                         data = {status: "failed", response: body};
                     } else {
-                        data = JSON.parse(body);
+                        data = _parse_response(body);  
                     }
                     if (!timed_out) {
                         clearTimeout(timeout_handle);
@@ -254,5 +254,13 @@
     // export module for node or environments with module loaders, such as webpack
     if (typeof module !== "undefined" && typeof require !== "undefined") {
         module.exports = sixpack;
+    }
+
+    var _parse_response = function(response) {
+        try {
+            return JSON.parse(response);
+        } catch(e) {
+            return {status: "failed", response: "Unable to parse response"};
+        }
     }
 })();
