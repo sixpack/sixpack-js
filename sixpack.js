@@ -201,7 +201,14 @@
                     if (res.statusCode / 100 === 5) {
                         data = {status: "failed", response: body};
                     } else {
-                        data = JSON.parse(body);
+                        try {
+                            data = JSON.parse(body);
+                        } catch (e) {
+                            if (!timed_out) {
+                                clearTimeout(timeout_handle);
+                                return callback(err);
+                            }
+                        }
                     }
                     if (!timed_out) {
                         clearTimeout(timeout_handle);
