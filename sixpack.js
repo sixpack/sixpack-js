@@ -1,6 +1,26 @@
 (function () {
     // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
-    Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
+    Object.assign || Object.defineProperty(Object, "assign", {
+        enumerable: !1,
+        configurable: !0,
+        writable: !0,
+        value: function (e) {
+            "use strict";
+            if (void 0 === e || null === e) throw new TypeError("Cannot convert first argument to object");
+            for (var r = Object(e), t = 1; t < arguments.length; t++) {
+                var n = arguments[t];
+                if (void 0 !== n && null !== n) {
+                    n = Object(n);
+                    for (var o = Object.keys(Object(n)), a = 0, c = o.length; c > a; a++) {
+                        var i = o[a],
+                            b = Object.getOwnPropertyDescriptor(n, i);
+                        void 0 !== b && b.enumerable && (r[i] = n[i])
+                    }
+                }
+            }
+            return r
+        }
+    });
 
     var sixpack = {
         base_url: "http://localhost:5000",
@@ -23,21 +43,22 @@
 
     sixpack.generate_client_id = function () {
         // from http://stackoverflow.com/questions/105034
-        var client_id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        var client_id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
         if (!on_node && this.persist) {
             var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
             if (this.cookie_domain) {
-              cookie_value += '; domain=' + this.cookie_domain;
+                cookie_value += '; domain=' + this.cookie_domain;
             }
             document.cookie = cookie_value;
         }
         return client_id;
     };
 
-    sixpack.persisted_client_id = function() {
+    sixpack.persisted_client_id = function () {
         // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
         var result;
         return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.cookie_name) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
@@ -60,13 +81,12 @@
     };
 
     sixpack.Session.prototype = {
-        participate: function(experiment_name, alternatives, traffic_fraction, force, callback) {
+        participate: function (experiment_name, alternatives, traffic_fraction, force, callback) {
             if (typeof traffic_fraction === "function") {
                 callback = traffic_fraction;
                 traffic_fraction = null;
                 force = null;
-            }
-            else if (typeof traffic_fraction === "string") {
+            } else if (typeof traffic_fraction === "string") {
                 callback = force;
                 force = traffic_fraction;
                 traffic_fraction = null;
@@ -93,13 +113,15 @@
                     return callback(new Error("Bad alternative name: " + alternatives[i]));
                 }
             }
-            var params = {client_id: this.client_id,
-                          experiment: experiment_name,
-                          alternatives: alternatives};
+            var params = {
+                client_id: this.client_id,
+                experiment: experiment_name,
+                alternatives: alternatives
+            };
             if (!on_node && force == null) {
                 var regex = new RegExp("[\\?&]sixpack-force-" + experiment_name + "=([^&#]*)");
                 var results = regex.exec(window.location.search);
-                if(results != null) {
+                if (results != null) {
                     force = decodeURIComponent(results[1].replace(/\+/g, " "));
                 }
             }
@@ -107,7 +129,17 @@
                 params.traffic_fraction = traffic_fraction;
             }
             if (force != null && _in_array(alternatives, force)) {
-                return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
+                return callback(null, {
+                    "status": "ok",
+                    "alternative": {
+                        "name": force
+                    },
+                    "experiment": {
+                        "version": 0,
+                        "name": experiment_name
+                    },
+                    "client_id": this.client_id
+                });
             }
             if (this.ip_address) {
                 params.ip_address = this.ip_address;
@@ -115,23 +147,27 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request(this.base_url + "/participate", params, this.timeout, function(err, res) {
+            return _request(this.base_url + "/participate", params, this.timeout, function (err, res) {
                 if (err) {
-                    res = {status: "failed",
-                           error: err,
-                           alternative: {name: alternatives[0]}};
+                    res = {
+                        status: "failed",
+                        error: err,
+                        alternative: {
+                            name: alternatives[0]
+                        }
+                    };
                 }
                 return callback(null, res);
             });
         },
-        convert: function(experiment_name, kpi, callback) {
+        convert: function (experiment_name, kpi, callback) {
             if (typeof kpi === 'function') {
                 callback = kpi;
                 kpi = null;
             }
 
             if (!callback) {
-                callback = function(err) {
+                callback = function (err) {
                     if (err && console && console.error) {
                         console.error(err);
                     }
@@ -142,8 +178,10 @@
                 return callback(new Error("Bad experiment_name"));
             }
 
-            var params = {client_id: this.client_id,
-                          experiment: experiment_name};
+            var params = {
+                client_id: this.client_id,
+                experiment: experiment_name
+            };
             if (this.ip_address) {
                 params.ip_address = this.ip_address;
             }
@@ -153,10 +191,12 @@
             if (kpi) {
                 params.kpi = kpi;
             }
-            return _request(this.base_url + "/convert", params, this.timeout, function(err, res) {
+            return _request(this.base_url + "/convert", params, this.timeout, function (err, res) {
                 if (err) {
-                    res = {status: "failed",
-                           error: err};
+                    res = {
+                        status: "failed",
+                        error: err
+                    };
                 }
                 return callback(null, res);
             });
@@ -165,7 +205,7 @@
 
     var counter = 0;
 
-    var _request = function(uri, params, timeout, callback) {
+    var _request = function (uri, params, timeout, callback) {
         var timed_out = false;
         var timeout_handle = setTimeout(function () {
             timed_out = true;
@@ -191,22 +231,28 @@
             document.body.appendChild(script);
         } else {
             var http = require('http');
-            var req = http.get(url, function(res) {
+            var req = http.get(url, function (res) {
                 var body = "";
-                res.on('data', function(chunk) {
+                res.on('data', function (chunk) {
                     return body += chunk;
                 });
-                return res.on('end', function() {
+                return res.on('end', function () {
                     var data;
                     if (res.statusCode / 100 === 5) {
-                        data = {status: "failed", response: body};
+                        data = {
+                            status: "failed",
+                            response: body
+                        };
                     } else {
                         try {
                             data = JSON.parse(body);
                         } catch (e) {
                             if (!timed_out) {
                                 clearTimeout(timeout_handle);
-                                return callback(err);
+                                data = {
+                                    status: "failed",
+                                    response: body
+                                };
                             }
                         }
                     }
@@ -216,7 +262,7 @@
                     }
                 });
             });
-            req.on('error', function(err) {
+            req.on('error', function (err) {
                 if (!timed_out) {
                     clearTimeout(timeout_handle);
                     return callback(err);
@@ -225,7 +271,7 @@
         }
     };
 
-    var _request_uri = function(endpoint, params) {
+    var _request_uri = function (endpoint, params) {
         var query_string = [];
         var e = encodeURIComponent;
         for (var key in params) {
@@ -245,9 +291,9 @@
         return endpoint;
     };
 
-    var _in_array = function(a, v) {
-        for(var i = 0; i < a.length; i++) {
-            if(a[i] === v) {
+    var _in_array = function (a, v) {
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] === v) {
                 return true;
             }
         }
