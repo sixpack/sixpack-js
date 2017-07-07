@@ -198,7 +198,7 @@
                 });
                 return res.on('end', function() {
                     var data;
-                    if (res.statusCode == 500) {
+                    if (res.statusCode / 100 === 5) {
                         data = {status: "failed", response: body};
                     } else {
                         data = JSON.parse(body);
