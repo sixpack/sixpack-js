@@ -1,3 +1,8 @@
+# Node
 node_modules
+
+# Log files
+*.log
+
 *~
 *#*
