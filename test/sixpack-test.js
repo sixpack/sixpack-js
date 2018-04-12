@@ -2,12 +2,21 @@ var mocha  = require('mocha');
 var assert = require('chai').assert;
 var expect = require('chai').expect;
 
-describe("Sixpack", function () {
+function createSixpackInstance(on_node) {
+    if (!on_node) {
+        global.document = global.document || {};
+        global.window = global.window || {};
+    }
+    delete require.cache[require.resolve('../')]
+    return require('../');
+}
+
+describe("Sixpack in node", function () {
     var sixpack;
     var session;
 
     beforeEach( () => {
-        sixpack = require('../');
+        sixpack = createSixpackInstance(true);
         session = new sixpack.Session();
 
         // Override default base_url when the SIXPACK_BASE_URL
@@ -210,5 +219,27 @@ describe("Sixpack", function () {
             expect(err.message).to.match(/^Must specify at least 2 alternatives$/);
             done();
         });
+    });
+});
+
+describe('Sixpack in browser', () => {
+    afterEach(() => {
+        delete global.document;
+        delete global.window;
+    });
+
+    it('should create sixpack instance in browser', () => {
+        global.window = {};
+        expect(window.sixpack).to.be.undefined;
+        createSixpackInstance(false);
+        expect(window.sixpack).to.be.an('object');
+    });
+
+    it('should not create another sixpack instance if exists in browser', () => {
+        var globalSixpack = {};
+        global.window = { sixpack: globalSixpack };
+        createSixpackInstance(false);
+
+        expect(window.sixpack).to.be.equal(globalSixpack);
     });
 });

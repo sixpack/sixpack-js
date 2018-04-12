@@ -2,7 +2,10 @@
     // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
     Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
 
-    var sixpack = {
+    // check if on node
+    var on_node = typeof window === "undefined";
+
+    var sixpack = (!on_node && window.sixpack) ? window.sixpack : {
         base_url: "http://localhost:5000",
         ip_address: null,
         user_agent: null,
@@ -10,23 +13,22 @@
         persist: true,
         cookie_name: "sixpack_client_id",
         cookie_domain: null,
-        ignore_alternates_warning: null
+        ignore_alternates_warning: false
     };
-
-    // check if on node, else expose on browser's global window object
-    var on_node = false;
-    if (typeof window === "undefined") {
-        on_node = true;
-    } else {
-        window["sixpack"] = sixpack;
+    if (!on_node) {
+        window.sixpack = sixpack;
     }
 
-    sixpack.generate_client_id = function () {
+    function generate_uuidv4() {
         // from http://stackoverflow.com/questions/105034
-        var client_id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
             return v.toString(16);
         });
+    }
+
+    sixpack.generate_client_id = function () {
+        var client_id = generate_uuidv4();
         if (!on_node && this.persist) {
             var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
             if (this.cookie_domain) {
@@ -163,8 +165,6 @@
         }
     };
 
-    var counter = 0;
-
     var _request = function(uri, params, timeout, callback) {
         var timed_out = false;
         var timeout_handle = setTimeout(function () {
@@ -173,7 +173,8 @@
         }, timeout);
 
         if (!on_node) {
-            var cb = "callback" + (++counter);
+            var suffix = generate_uuidv4().replace(/-/g, '');
+            var cb = "callback" + suffix;
             params.callback = "sixpack." + cb
             sixpack[cb] = function (res) {
                 if (!timed_out) {
