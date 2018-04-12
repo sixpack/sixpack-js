@@ -4,7 +4,7 @@
   "description": "JS client for SeatGeek's Sixpack AB testing framework.",
   "main": "sixpack.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --globals document,window"
   },
   "repository": {
     "type": "git",
