@@ -1,0 +1,26 @@
+version: "2"
+services:
+  client:
+    build: .
+    command: "yarn run test:mocha"
+    environment:
+      NODE_ENV: "test"
+      SIXPACK_BASE_URL: "http://server:8000"
+    depends_on:
+      - server
+
+  server:
+    image: leogamas/sixpack:v0.1
+    command: "sixpack.server:start"
+    expose:
+      - 8000
+    environment:
+      - SIXPACK_CONFIG_ENABLED=true
+      - SIXPACK_CONFIG_REDIS_PORT=6379
+      - SIXPACK_CONFIG_REDIS_HOST=redis
+      - SIXPACK_CONFIG_REDIS_PREFIX=sixpack
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:3.0.0

@@ -4,7 +4,8 @@
   "description": "JS client for SeatGeek's Sixpack AB testing framework.",
   "main": "sixpack.js",
   "scripts": {
-    "test": "mocha --globals document,window"
+    "test": "docker-compose up --abort-on-container-exit --exit-code-from client",
+    "test:mocha": "mocha --globals document,window"
   },
   "repository": {
     "type": "git",
