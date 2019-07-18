@@ -1,6 +1,6 @@
 {
-  "name": "sixpack-client",
-  "version": "2.1.2",
+  "name": "@jusbrasil/sixpack-client",
+  "version": "2.2.0",
   "description": "JS client for SeatGeek's Sixpack AB testing framework.",
   "main": "sixpack.js",
   "scripts": {
@@ -9,12 +9,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/seatgeek/sixpack-js.git"
+    "url": "git://github.com/jusbrasil/sixpack-js.git"
   },
   "author": "SeatGeek",
   "license": "MIT",
   "readmeFilename": "README.md",
-  "gitHead": "442fafd22f38396e4cba7030cc18dbc93dd1d018",
   "devDependencies": {
     "mocha": "~1.8.1",
     "chai": "~1.5.0"
