@@ -14,7 +14,8 @@
         persist: true,
         cookie_name: "sixpack_client_id",
         cookie_domain: null,
-        ignore_alternates_warning: false
+        ignore_alternates_warning: false,
+        cookie: '',
     };
     if (!on_node) {
         window.sixpack = sixpack;
@@ -120,7 +121,7 @@
             if (this.user_agent) {
                 params.user_agent = this.user_agent;
             }
-            return _request(this.base_url + "/participate", params, this.timeout, function(err, res) {
+            return _request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
                 if (err) {
                     res = {status: "failed",
                            error: err,
@@ -160,7 +161,7 @@
             if (kpi) {
                 params.kpi = kpi;
             }
-            return _request(this.base_url + "/convert", params, this.timeout, function(err, res) {
+            return _request(this.base_url + "/convert", params, this.timeout, this.cookie, function(err, res) {
                 if (err) {
                     res = {status: "failed",
                            error: err};
@@ -170,7 +171,7 @@
         }
     };
 
-    var _request = function(uri, params, timeout, callback) {
+    var _request = function(uri, params, timeout, cookie, callback) {
         var timed_out = false;
         var timeout_handle = setTimeout(function () {
             timed_out = true;
@@ -197,7 +198,7 @@
             document.body.appendChild(script);
         } else {
             var http = require('http');
-            var req = http.get(url, function(res) {
+            var req = http.get(url, { headers: { 'Cookie': cookie } }, function(res) {
                 var body = "";
                 res.on('data', function(chunk) {
                     return body += chunk;

@@ -1,6 +1,6 @@
 {
   "name": "@jusbrasil/sixpack-client",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "JS client for SeatGeek's Sixpack AB testing framework.",
   "main": "sixpack.js",
   "scripts": {
@@ -14,8 +14,11 @@
   "author": "SeatGeek",
   "license": "MIT",
   "readmeFilename": "README.md",
+  "publishConfig": {
+    "registry": "http://nexus.apps.jusbr.com/repository/npm-internal/"
+  },
   "devDependencies": {
-    "mocha": "~1.8.1",
-    "chai": "~1.5.0"
+    "chai": "4.2.0",
+    "mocha": "7.0.1"
   }
 }

@@ -17,12 +17,35 @@ describe("Sixpack in node", function () {
 
     beforeEach( () => {
         sixpack = createSixpackInstance(true);
-        session = new sixpack.Session();
+        session = new sixpack.Session({
+            cookie: 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;'
+        });
 
         // Override default base_url when the SIXPACK_BASE_URL
         // environment variable is found.
         if (process.env.SIXPACK_BASE_URL) {
             session.base_url = process.env.SIXPACK_BASE_URL;
+        }
+    });
+
+    it("should forward 'Cookie' header", function (done) {
+        var http = require('http');
+        var originalGet = http.get;
+        var receivedHeaders;
+        try {
+            http.get = (url, options, callback) => {
+                receivedHeaders = options.headers;
+                return originalGet(url, options, callback);
+            }
+            session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
+                if (err) throw err;
+                expect(receivedHeaders['Cookie']).to.equal(
+                    'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;'
+                );
+                done();
+            });
+        } finally {
+            http.get = originalGet;
         }
     });
 
