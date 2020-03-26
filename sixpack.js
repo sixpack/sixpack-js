@@ -112,8 +112,8 @@
             if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
                 params.traffic_fraction = traffic_fraction;
             }
-            if (force != null && _in_array(alternatives, force)) {
-                return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id});
+            if (force != null) {
+                return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id, "participating": true});
             }
             if (this.ip_address) {
                 params.ip_address = this.ip_address;
@@ -244,15 +244,6 @@
             endpoint += '?' + query_string.join('&');
         }
         return endpoint;
-    };
-
-    var _in_array = function(a, v) {
-        for(var i = 0; i < a.length; i++) {
-            if(a[i] === v) {
-                return true;
-            }
-        }
-        return false;
     };
 
     // export module for node or environments with module loaders, such as webpack

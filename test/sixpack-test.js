@@ -65,27 +65,40 @@ describe("Sixpack in node", function () {
         });
     });
 
-    it("should return forced alternative for participate with force", function (done) {
+    it("should return forced alternative with participating for participate with force", function (done) {
         session.participate("show-bieber", ["trolled", "not-trolled"], "trolled", function(err, resp) {
             if (err) throw err;
             expect(resp.alternative.name).to.equal("trolled");
+            expect(resp.participating).to.equal(true);
             session.participate("show-bieber", ["trolled", "not-trolled"], "not-trolled", function(err, resp) {
                 if (err) throw err;
                 expect(resp.alternative.name).to.equal("not-trolled");
+                expect(resp.participating).to.equal(true);
                 done();
             });
         });
     });
 
-    it("should return ok and forced alternative for participate with traffic_fraction and force", function (done) {
+    it("should return forced alternative with participating for participate with force even if outside alternatives", function (done) {
+        session.participate("show-bieber", ["trolled", "not-trolled"], "whatever", function(err, resp) {
+            if (err) throw err;
+            expect(resp.alternative.name).to.equal("whatever");
+            expect(resp.participating).to.equal(true);
+            done();
+        });
+    });
+
+    it("should return ok and forced alternative with participating for participate with traffic_fraction and force", function (done) {
         session.participate("show-bieber-fraction", ["trolled", "not-trolled"], 0.1, "trolled", function(err, resp) {
             if (err) throw err;
             expect(resp.status).to.equal("ok");
             expect(resp.alternative.name).to.equal("trolled");
+            expect(resp.participating).to.equal(true);
             session.participate("show-bieber-fraction", ["trolled", "not-trolled"], 0.1, "not-trolled", function(err, resp) {
                 if (err) throw err;
                 expect(resp.status).to.equal("ok");
                 expect(resp.alternative.name).to.equal("not-trolled");
+                expect(resp.participating).to.equal(true);
                 done();
             });
         });
