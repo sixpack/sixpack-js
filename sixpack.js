@@ -190,7 +190,13 @@
             script.async = true;
             document.body.appendChild(script);
         } else {
-            var http = require('http');
+
+            if (url.indexOf('https') === 0) {
+                var http = require('https');
+            } else {
+                var http = require('http');
+            }
+
             var req = http.get(url, function(res) {
                 var body = "";
                 res.on('data', function(chunk) {
