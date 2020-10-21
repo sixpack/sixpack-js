@@ -15,7 +15,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "publishConfig": {
-    "registry": "http://nexus.apps.jusbr.com/repository/npm-internal/"
+    "registry": "https://nexus.apps.jusbr.com/repository/npm-internal/"
   },
   "devDependencies": {
     "chai": "4.2.0",
