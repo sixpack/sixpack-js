@@ -197,8 +197,8 @@
             script.async = true;
             document.body.appendChild(script);
         } else {
-            const httpModule = url.startsWith('https') ? 'https' : 'http';
-            var http = require(httpModule);
+            var httpModule = url.startsWith('https') ? 'https' : 'http';
+            var http = eval('require')(httpModule); // using eval to skip webpack bundling and warnings
             var req = http.get(url, { headers: { 'Cookie': cookie } }, function(res) {
                 var body = "";
                 res.on('data', function(chunk) {
