@@ -1,4 +1,4 @@
-var mocha  = require('mocha');
+var nock = require('nock');
 var assert = require('chai').assert;
 var expect = require('chai').expect;
 
@@ -26,6 +26,8 @@ describe("Sixpack in node", function () {
         if (process.env.SIXPACK_BASE_URL) {
             session.base_url = process.env.SIXPACK_BASE_URL;
         }
+
+        nock.cleanAll();
     });
 
     it("should forward 'Cookie' header", function (done) {
@@ -53,6 +55,39 @@ describe("Sixpack in node", function () {
         session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
             if (err) throw err;
             expect(resp.alternative.name).to.match(/trolled/);
+            done();
+        });
+    });
+
+    it("should return error body in status code 500", function (done) {
+        var body = "Internal Server Error";
+        nock(session.base_url).get(/\/participate/).reply(500, body);
+        session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
+            if (err) throw err;
+            expect(resp.status).to.equal("failed");
+            expect(resp.response).to.equal(body);
+            done();
+        });
+    });
+
+    it("should return error body in status code greater than 500", function (done) {
+        var body = "Bad Gateway";
+        nock(session.base_url).get(/\/participate/).reply(502, body);
+        session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
+            if (err) throw err;
+            expect(resp.status).to.equal("failed");
+            expect(resp.response).to.equal(body);
+            done();
+        });
+    });
+
+    it("should return error body in malformed JSON response", function (done) {
+        var body = "definitely not a JSON";
+        nock(session.base_url).get(/\/participate/).reply(200, body);
+        session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
+            if (err) throw err;
+            expect(resp.status).to.equal("failed");
+            expect(resp.response).to.equal(body);
             done();
         });
     });

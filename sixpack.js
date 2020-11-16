@@ -205,12 +205,16 @@
                     return body += chunk;
                 });
                 return res.on('end', function() {
-                    var data;
-                    if (res.statusCode == 500) {
-                        data = {status: "failed", response: body};
-                    } else {
-                        data = JSON.parse(body);
+                    var data = { status: 'failed', response: body };
+
+                    if (res.statusCode < 500) {
+                        try {
+                            data = JSON.parse(body);
+                        } catch (err) {
+                            console.error(err);
+                        }
                     }
+
                     if (!timed_out) {
                         clearTimeout(timeout_handle);
                         return callback(null, data);
