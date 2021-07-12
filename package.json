@@ -3,6 +3,9 @@
   "version": "2.3.4",
   "description": "JS client for SeatGeek's Sixpack AB testing framework.",
   "main": "sixpack.js",
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
     "test": "docker-compose up --build --abort-on-container-exit --exit-code-from client",
     "test:mocha": "mocha --globals document,window"

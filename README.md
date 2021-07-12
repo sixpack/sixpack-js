@@ -80,6 +80,20 @@ Run the tests with:
 npm run test
 ```
 
+### Running tests outside of docker container
+We can also run tests outside a docker container. To do that:
+
+Run server apps:
+```sh
+docker-compose up -d && docker-compose logs -f -t
+```
+
+Now we can run tests using dockerized environment by running:
+```sh
+SIXPACK_BASE_URL=http://localhost:8000 yarn test:mocha
+```
+
+
 ### Sixpack server location
 
 The tests assume the [sixpack-server](https://github.com/seatgeek/sixpack) server is running and located at `http://localhost:5000`. To use a different location, _e.g._ for a Docker [container](https://github.com/ainoya/docker-sixpack), run tests with the following pattern:

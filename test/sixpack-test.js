@@ -35,9 +35,9 @@ describe("Sixpack in node", function () {
         var originalGet = http.get;
         var receivedHeaders;
         try {
-            http.get = (url, options, callback) => {
+            http.get = (options, callback) => {
                 receivedHeaders = options.headers;
-                return originalGet(url, options, callback);
+                return originalGet(options, callback);
             }
             session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
                 if (err) throw err;

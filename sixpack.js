@@ -199,7 +199,16 @@
         } else {
             var httpModule = url.startsWith('https') ? 'https' : 'http';
             var http = eval('require')(httpModule); // using eval to skip webpack bundling and warnings
-            var req = http.get(url, { headers: { 'Cookie': cookie } }, function(res) {
+
+            var parsedUrl = new URL(url);
+            var options = {
+                protocol: parsedUrl.protocol,
+                port: parsedUrl.port,
+                hostname: parsedUrl.hostname,
+                path: parsedUrl.pathname + parsedUrl.search, 
+                headers: { Cookie: cookie }
+            }
+            var req = http.get(options, function(res) {
                 var body = "";
                 res.on('data', function(chunk) {
                     return body += chunk;

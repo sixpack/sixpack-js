@@ -12,6 +12,8 @@ services:
   server:
     image: leogamas/sixpack:v0.1
     command: "sixpack.server:start"
+    ports:
+      - "8000:8000"
     expose:
       - 8000
     environment:
