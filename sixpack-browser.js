@@ -258,9 +258,4 @@
         }
         return endpoint;
     };
-
-    // export module for node or environments with module loaders, such as webpack
-    if (typeof module !== "undefined" && typeof require !== "undefined") {
-        module.exports = sixpack;
-    }
 })();
