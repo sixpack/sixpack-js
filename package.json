@@ -7,7 +7,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "test": "docker-compose up --build --abort-on-container-exit --exit-code-from client",
+    "test": "docker-compose up -d && SIXPACK_BASE_URL=http://localhost:8000 yarn test:mocha",
     "test:mocha": "mocha --globals document,window"
   },
   "repository": {
