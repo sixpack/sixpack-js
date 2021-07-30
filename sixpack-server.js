@@ -23,22 +23,11 @@ var _request_uri = require('./sixpack-commom')._request_uri;
     return generate_uuidv4();
   };
 
-  sixpack.persisted_client_id = function() {
-    // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
-    var result;
-    return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.cookie_name) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
-  };
-
   sixpack.Session = function (options) {
     Object.assign(this, sixpack, options);
 
     if (!this.client_id) {
-        if (this.persist && !on_node) {
-            var persisted_id = this.persisted_client_id();
-            this.client_id = persisted_id !== null ? persisted_id : this.generate_client_id();
-        } else {
-            this.client_id = this.generate_client_id();
-        }
+      this.client_id = this.generate_client_id();
     }
   };
 
