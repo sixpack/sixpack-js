@@ -8,7 +8,7 @@ var _request_uri = require('./sixpack-commom')._request_uri;
     // check if on node
     var on_node = false;
 
-    var sixpack = (!on_node && window.sixpack) ? window.sixpack : {
+    var sixpack = window.sixpack ? window.sixpack : {
         base_url: "http://localhost:5000",
         extra_params: {},
         ip_address: null,
@@ -24,7 +24,7 @@ var _request_uri = require('./sixpack-commom')._request_uri;
 
     sixpack.generate_client_id = function () {
         var client_id = generate_uuidv4();
-        if (!on_node && this.persist) {
+        if (this.persist) {
             var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
             if (this.cookie_domain) {
               cookie_value += '; domain=' + this.cookie_domain;
