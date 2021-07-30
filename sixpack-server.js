@@ -1,4 +1,5 @@
 var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
+var _request_uri = require('./sixpack-commom')._request_uri;
 
 (function () {
 
@@ -223,26 +224,6 @@ var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
               }
           });
       }
-  };
-
-  var _request_uri = function(endpoint, params) {
-      var query_string = [];
-      var e = encodeURIComponent;
-      for (var key in params) {
-          if (params.hasOwnProperty(key)) {
-              var vals = params[key];
-              if (Object.prototype.toString.call(vals) !== '[object Array]') {
-                  vals = [vals];
-              }
-              for (var i = 0; i < vals.length; i += 1) {
-                  query_string.push(e(key) + '=' + e(vals[i]));
-              }
-          }
-      }
-      if (query_string.length) {
-          endpoint += '?' + query_string.join('&');
-      }
-      return endpoint;
   };
 
   module.exports = sixpack;
