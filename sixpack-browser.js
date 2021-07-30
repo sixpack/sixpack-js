@@ -1,9 +1,11 @@
+var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
+
 (function () {
     // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
     Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
 
     // check if on node
-    var on_node = typeof window === "undefined";
+    var on_node = false;
 
     var sixpack = (!on_node && window.sixpack) ? window.sixpack : {
         base_url: "http://localhost:5000",
@@ -19,14 +21,6 @@
     };
     if (!on_node) {
         window.sixpack = sixpack;
-    }
-
-    function generate_uuidv4() {
-        // from http://stackoverflow.com/questions/105034
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-            return v.toString(16);
-        });
     }
 
     sixpack.generate_client_id = function () {

@@ -1,4 +1,10 @@
+var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
+
 (function () {
+
+  // just for tests pass
+  var on_node = true;
+
   var sixpack = {
     base_url: "http://localhost:5000",
     extra_params: {},
@@ -11,14 +17,6 @@
     ignore_alternates_warning: false,
     cookie: '',
   };
-
-  function generate_uuidv4() {
-    // from http://stackoverflow.com/questions/105034
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-      return v.toString(16);
-    });
-  }
 
   sixpack.generate_client_id = function () {
     var client_id = generate_uuidv4();
