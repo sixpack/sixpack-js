@@ -20,15 +20,7 @@ var _request_uri = require('./sixpack-commom')._request_uri;
   };
 
   sixpack.generate_client_id = function () {
-    var client_id = generate_uuidv4();
-    if (!on_node && this.persist) {
-      var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
-      if (this.cookie_domain) {
-        cookie_value += '; domain=' + this.cookie_domain;
-      }
-      document.cookie = cookie_value;
-    }
-    return client_id;
+    return generate_uuidv4();
   };
 
   sixpack.persisted_client_id = function() {
