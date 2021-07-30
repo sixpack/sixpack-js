@@ -44,20 +44,20 @@ var _request_uri = require('./sixpack-commom')._request_uri;
         Object.assign(this, sixpack, options);
 
         if (!this.client_id) {
-            if (this.persist && !on_node) {
+            if (this.persist) {
                 var persisted_id = this.persisted_client_id();
                 this.client_id = persisted_id !== null ? persisted_id : this.generate_client_id();
             } else {
                 this.client_id = this.generate_client_id();
             }
         }
-        if (!on_node) {
-            this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
-        }
+
+        this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
     };
 
     sixpack.Session.prototype = {
         participate: function(experiment_name, alternatives, traffic_fraction, force, callback) {
+            // TODO - move this to commom
             if (typeof traffic_fraction === "function") {
                 callback = traffic_fraction;
                 traffic_fraction = null;
@@ -124,6 +124,7 @@ var _request_uri = require('./sixpack-commom')._request_uri;
             });
         },
         convert: function(experiment_name, kpi, callback) {
+          // TODO - move this to commom
             if (typeof kpi === 'function') {
                 callback = kpi;
                 kpi = null;
