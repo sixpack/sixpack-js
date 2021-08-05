@@ -166,70 +166,27 @@ var _request_uri = require('./sixpack-commom')._request_uri;
     };
 
     var _request = function(uri, params, timeout, cookie, callback) {
-        var timed_out = false;
-        var timeout_handle = setTimeout(function () {
-            timed_out = true;
-            return callback(new Error("request timed out"));
-        }, timeout);
+      var timed_out = false;
+      var timeout_handle = setTimeout(function () {
+        timed_out = true;
+        return callback(new Error("request timed out"));
+      }, timeout);
 
-        if (!on_node) {
-            var suffix = generate_uuidv4().replace(/-/g, '');
-            var cb = "callback" + suffix;
-            params.callback = "sixpack." + cb;
-            sixpack[cb] = function (res) {
-                if (!timed_out) {
-                    clearTimeout(timeout_handle);
-                    return callback(null, res);
-                }
-            }
+      var suffix = generate_uuidv4().replace(/-/g, '');
+      var cb = "callback" + suffix;
+      params.callback = "sixpack." + cb;
+      sixpack[cb] = function (res) {
+        if (!timed_out) {
+          clearTimeout(timeout_handle);
+          return callback(null, res);
         }
-        var url = _request_uri(uri, params);
-        if (!on_node) {
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = url;
-            script.async = true;
-            document.body.appendChild(script);
-        } else {
-            var httpModule = url.startsWith('https') ? 'https' : 'http';
-            var http = eval('require')(httpModule); // using eval to skip webpack bundling and warnings
+      }
 
-            var parsedUrl = new URL(url);
-            var options = {
-                protocol: parsedUrl.protocol,
-                port: parsedUrl.port,
-                hostname: parsedUrl.hostname,
-                path: parsedUrl.pathname + parsedUrl.search, 
-                headers: { Cookie: cookie }
-            }
-            var req = http.get(options, function(res) {
-                var body = "";
-                res.on('data', function(chunk) {
-                    return body += chunk;
-                });
-                return res.on('end', function() {
-                    var data = { status: 'failed', response: body };
-
-                    if (res.statusCode < 500) {
-                        try {
-                            data = JSON.parse(body);
-                        } catch (err) {
-                            console.error(err);
-                        }
-                    }
-
-                    if (!timed_out) {
-                        clearTimeout(timeout_handle);
-                        return callback(null, data);
-                    }
-                });
-            });
-            req.on('error', function(err) {
-                if (!timed_out) {
-                    clearTimeout(timeout_handle);
-                    return callback(err);
-                }
-            });
-        }
+      var url = _request_uri(uri, params);
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = url;
+      script.async = true;
+      document.body.appendChild(script);
     };
 })();
