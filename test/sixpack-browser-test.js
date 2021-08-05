@@ -83,4 +83,58 @@ describe('Sixpack Browser Client', () => {
       http.get = originalGet;
     }
   });
+
+  it("should return an alternative for participate", function (done) {
+    window.location = {};
+    document.body = document.body || {};
+    document.body.appendChild = stub()
+    document.createElement = stub().returns({});
+
+    session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
+      if (err) throw err;
+      expect(resp.alternative.name).to.match(/trolled/);
+      done();
+    });
+  });
+
+  it("should return ok and forced alternative with participating for participate with traffic_fraction and force", function (done) {
+    document.body = document.body || {};
+    document.body.appendChild = stub()
+    document.createElement = stub().returns({});
+
+    session.participate("show-bieber-fraction", ["trolled", "not-trolled"], 0.1, "trolled", function(err, resp) {
+      if (err) throw err;
+      expect(resp.status).to.equal("ok");
+      expect(resp.alternative.name).to.equal("trolled");
+      expect(resp.participating).to.equal(true);
+      session.participate("show-bieber-fraction", ["trolled", "not-trolled"], 0.1, "not-trolled", function(err, resp) {
+        if (err) throw err;
+        expect(resp.status).to.equal("ok");
+        expect(resp.alternative.name).to.equal("not-trolled");
+        expect(resp.participating).to.equal(true);
+        done();
+      });
+    });
+  });
+
+  it('should return forced alternative from url defininf traffic_fraction', (done) => {
+    const experiment = 'show-bieber-fraction';
+    const variants = ['trolled', 'not-trolled'];
+    const forcedVariant = variants[0];
+
+    window.location = {
+      search: `https://www.jusbrasil.com.br/busca?q=teste&sixpack-force-${experiment}=${forcedVariant}`,
+    };
+    document.body = document.body || {};
+    document.body.appendChild = stub()
+    document.createElement = stub().returns({});
+
+    session.participate(experiment, variants, 0.1, function(err, resp) {
+      if (err) throw err;
+      expect(resp.status).to.equal("ok");
+      expect(resp.alternative.name).to.equal(forcedVariant);
+      expect(resp.participating).to.equal(true);
+      done();
+    });
+  })
 });
