@@ -4,5 +4,7 @@ node_modules
 # Log files
 *.log
 
+.nyc_output
+
 *~
 *#*
