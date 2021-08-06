@@ -38,46 +38,46 @@ var _request_uri = require('./sixpack-commom')._request_uri;
     };
 
     sixpack.Session = function (options) {
-        Object.assign(this, sixpack, options);
+      Object.assign(this, sixpack, options);
 
-        if (!this.client_id) {
-            if (this.persist) {
-                var persisted_id = this.persisted_client_id();
-                this.client_id = persisted_id !== null ? persisted_id : this.generate_client_id();
-            } else {
-                this.client_id = this.generate_client_id();
-            }
+      if (!this.client_id) {
+        if (this.persist) {
+          var persisted_id = this.persisted_client_id();
+          this.client_id = persisted_id !== null ? persisted_id : this.generate_client_id();
+        } else {
+          this.client_id = this.generate_client_id();
         }
+      }
 
-        this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
+      this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
     };
 
     sixpack.Session.prototype = {
       participate: function(experiment_name, alternatives, traffic_fraction, force, callback) {
         if (typeof traffic_fraction === "function") {
-            callback = traffic_fraction;
-            traffic_fraction = null;
-            force = null;
+          callback = traffic_fraction;
+          traffic_fraction = null;
+          force = null;
         } else if (typeof traffic_fraction === "string") {
-            callback = force;
-            force = traffic_fraction;
-            traffic_fraction = null;
+          callback = force;
+          force = traffic_fraction;
+          traffic_fraction = null;
         }
         if (typeof force === "function") {
-            callback = force;
-            force = null;
+          callback = force;
+          force = null;
         }
 
         if (!callback) {
-            throw new Error("Callback is not specified");
+          throw new Error("Callback is not specified");
         }
 
         if (!experiment_name || !(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
-            return callback(new Error("Bad experiment_name"));
+          return callback(new Error("Bad experiment_name"));
         }
 
         if (alternatives.length < 2 && this.ignore_alternates_warning !== true) {
-            return callback(new Error("Must specify at least 2 alternatives"));
+          return callback(new Error("Must specify at least 2 alternatives"));
         }
 
         for (var i = 0; i < alternatives.length; i += 1) {
@@ -87,9 +87,9 @@ var _request_uri = require('./sixpack-commom')._request_uri;
         }
 
         var params = Object.assign({}, this.extra_params, {
-            client_id: this.client_id,
-            experiment: experiment_name,
-            alternatives: alternatives
+          client_id: this.client_id,
+          experiment: experiment_name,
+          alternatives: alternatives
         });
         // different thant server lib
         if (force == null) {
@@ -107,10 +107,10 @@ var _request_uri = require('./sixpack-commom')._request_uri;
         }
 
         if (this.ip_address) {
-            params.ip_address = this.ip_address;
+          params.ip_address = this.ip_address;
         }
         if (this.user_agent) {
-            params.user_agent = this.user_agent;
+          params.user_agent = this.user_agent;
         }
 
         return _request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
@@ -121,43 +121,44 @@ var _request_uri = require('./sixpack-commom')._request_uri;
         });
       },
       convert: function(experiment_name, kpi, callback) {
-          if (typeof kpi === 'function') {
-              callback = kpi;
-              kpi = null;
+        if (typeof kpi === 'function') {
+          callback = kpi;
+          kpi = null;
+        }
+  
+        if (!callback) {
+          callback = function(err) {
+            if (err && console && console.error) {
+              console.error(err);
+            }
           }
-
-          if (!callback) {
-              callback = function(err) {
-                  if (err && console && console.error) {
-                      console.error(err);
-                  }
-              }
+        }
+  
+        if (!experiment_name || !(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
+          return callback(new Error("Bad experiment_name"));
+        }
+  
+        var params = Object.assign({}, this.extra_params, {
+          client_id: this.client_id,
+          experiment: experiment_name
+        });
+  
+        if (this.ip_address) {
+          params.ip_address = this.ip_address;
+        }
+        if (this.user_agent) {
+          params.user_agent = this.user_agent;
+        }
+        if (kpi) {
+          params.kpi = kpi;
+        }
+  
+        return _request(this.base_url + "/convert", params, this.timeout, this.cookie, function(err, res) {
+          if (err) {
+            res = { status: "failed", error: err };
           }
-
-          if (!experiment_name || !(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
-              return callback(new Error("Bad experiment_name"));
-          }
-
-          var params = Object.assign({}, this.extra_params, {
-              client_id: this.client_id,
-              experiment: experiment_name
-          });
-          if (this.ip_address) {
-            params.ip_address = this.ip_address;
-          }
-          if (this.user_agent) {
-            params.user_agent = this.user_agent;
-          }
-          if (kpi) {
-            params.kpi = kpi;
-          }
-          return _request(this.base_url + "/convert", params, this.timeout, this.cookie, function(err, res) {
-              if (err) {
-                  res = {status: "failed",
-                          error: err};
-              }
-              return callback(null, res);
-          });
+          return callback(null, res);
+        });
       }
     };
 
