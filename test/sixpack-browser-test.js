@@ -178,5 +178,48 @@ describe('Sixpack Browser Client', () => {
         });
       });
     });
+
+    it("should return ok for multiple converts", function (done) {
+      session.client_id = "mike";
+      session.participate("show-bieber", ["trolled", "not-trolled"], function(err, alt) {
+        if (err) throw err;
+        session.convert("show-bieber", function(err, resp) {
+          if (err) throw err;
+          expect(resp.status).to.equal("ok");
+          session.convert("show-bieber", function(err, alt) {
+            if (err) throw err;
+            expect(resp.status).to.equal("ok");
+            done();
+          });
+        });
+      });
+    });
+
+    it("should not return ok for convert with new client_id", function (done) {
+      session.client_id = "unknown_idizzle";
+      session.convert("show-bieber", function(err, resp) {
+        if (err) throw err;
+        expect(resp.status).to.equal("failed");
+        done();
+      });
+    });
+
+    it("should not return ok for convert with new experiment", function (done) {
+      session.client_id = "mike";
+      session.convert("show-blieber", function(err, resp) {
+        if (err) throw err;
+        expect(resp.status).to.equal("failed");
+        done();
+      });
+    });
+
+    it("should return ok for convert with kpi", function (done) {
+      session.client_id = "mike";
+      session.convert("show-bieber", "justin-shown", function(err, resp) {
+        if (err) throw err;
+        expect(resp.status).to.equal("ok");
+        done();
+      });
+    });
   });
 });
