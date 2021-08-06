@@ -7,6 +7,10 @@ function generate_uuidv4() {
   });
 }
 
+function is_valid_experiment_name(experiment_name) {
+  return (experiment_name && (/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name));
+}
+
 function _request_uri(endpoint, params) {
   var query_string = [];
   var e = encodeURIComponent;
@@ -27,4 +31,8 @@ function _request_uri(endpoint, params) {
   return endpoint;
 };
 
-module.exports = { generate_uuidv4, _request_uri }
+module.exports = {
+  generate_uuidv4,
+  is_valid_experiment_name,
+  _request_uri
+}

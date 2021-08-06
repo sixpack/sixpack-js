@@ -1,4 +1,5 @@
 var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
+var is_valid_experiment_name = require('./sixpack-commom').is_valid_experiment_name;
 var _request_uri = require('./sixpack-commom')._request_uri;
 
 (function () {
@@ -72,7 +73,7 @@ var _request_uri = require('./sixpack-commom')._request_uri;
           throw new Error("Callback is not specified");
         }
 
-        if (!experiment_name || !(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
+        if (!is_valid_experiment_name(experiment_name)) {
           return callback(new Error("Bad experiment_name"));
         }
 
@@ -133,11 +134,11 @@ var _request_uri = require('./sixpack-commom')._request_uri;
             }
           }
         }
-  
-        if (!experiment_name || !(/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name)) {
+
+        if (!is_valid_experiment_name(experiment_name)) {
           return callback(new Error("Bad experiment_name"));
         }
-  
+
         var params = Object.assign({}, this.extra_params, {
           client_id: this.client_id,
           experiment: experiment_name
