@@ -2,12 +2,19 @@ var chai = require('chai');
 var sinon = require('sinon');
 chai.use(require('sinon-chai'));
 
-var { expect } = chai;
+var { expect, assert } = chai;
 var { stub } = sinon;
 
-function createSixpackInstance() {
+const createSixpackInstance = () => {
   delete require.cache[require.resolve('../sixpack-browser')]
   return require('../sixpack-browser');
+}
+
+const stubDocument = () => {
+  window.location = {};
+  document.body = document.body || {};
+  document.body.appendChild = stub()
+  document.createElement = stub().returns({});
 }
 
 describe('Sixpack Browser Client', () => {
@@ -32,14 +39,14 @@ describe('Sixpack Browser Client', () => {
     delete global.window;
   });
 
-  it('should create sixpack instance in browser', () => {
+  it('should create sixpack instance in browser', function () {
     global.window = {};
     expect(window.sixpack).to.be.undefined;
     createSixpackInstance();
     expect(window.sixpack).to.be.an('object');
   });
 
-  it('should not create another sixpack instance if exists in browser', () => {
+  it('should not create another sixpack instance if exists in browser', function () {
     var globalSixpack = {};
     global.window = { sixpack: globalSixpack };
     createSixpackInstance();
@@ -47,11 +54,11 @@ describe('Sixpack Browser Client', () => {
     expect(window.sixpack).to.be.equal(globalSixpack);
   });
 
-  it('should create sixpack instance in browser', () => {
+  it('should create sixpack instance in browser', function () {
     expect(window.sixpack).to.be.an('object');
   })
 
-  it('should create sixpack instance', () => {
+  it('should create sixpack instance', function () {
     expect(window.sixpack).to.be.an('object');
   })
 
@@ -85,10 +92,7 @@ describe('Sixpack Browser Client', () => {
   });
 
   it("should return an alternative for participate", function (done) {
-    window.location = {};
-    document.body = document.body || {};
-    document.body.appendChild = stub()
-    document.createElement = stub().returns({});
+    stubDocument();
 
     session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
       if (err) throw err;
@@ -98,9 +102,7 @@ describe('Sixpack Browser Client', () => {
   });
 
   it("should return ok and forced alternative with participating for participate with traffic_fraction and force", function (done) {
-    document.body = document.body || {};
-    document.body.appendChild = stub()
-    document.createElement = stub().returns({});
+    stubDocument();
 
     session.participate("show-bieber-fraction", ["trolled", "not-trolled"], 0.1, "trolled", function(err, resp) {
       if (err) throw err;
@@ -117,17 +119,15 @@ describe('Sixpack Browser Client', () => {
     });
   });
 
-  it('should return forced alternative from url defininf traffic_fraction', (done) => {
+  it('should return forced alternative from url defininf traffic_fraction', function (done) {
     const experiment = 'show-bieber-fraction';
     const variants = ['trolled', 'not-trolled'];
     const forcedVariant = variants[0];
 
+    stubDocument();
     window.location = {
       search: `https://www.jusbrasil.com.br/busca?q=teste&sixpack-force-${experiment}=${forcedVariant}`,
     };
-    document.body = document.body || {};
-    document.body.appendChild = stub()
-    document.createElement = stub().returns({});
 
     session.participate(experiment, variants, 0.1, function(err, resp) {
       if (err) throw err;
@@ -136,5 +136,59 @@ describe('Sixpack Browser Client', () => {
       expect(resp.participating).to.equal(true);
       done();
     });
-  })
+  });
+
+  it("should return forced alternative with participating for participate with force even if outside alternatives", function (done) {
+    stubDocument();
+
+    session.participate("show-bieber", ["trolled", "not-trolled"], "whatever", function(err, resp) {
+      if (err) throw err;
+      expect(resp.alternative.name).to.equal("whatever");
+      expect(resp.participating).to.equal(true);
+      done();
+    });
+  });
+
+  it("should auto generate a client_id", function (done) {
+    expect(session.client_id.length).to.equal(36);
+    done();
+  });
+
+  it("should throw an error when callback is undefined", function (done) {
+    stubDocument();
+
+    session.client_id = "mike";
+    expect(function() {
+      session.participate("show-bieber", ["trolled", "not-trolled"]);
+    }).to.throw(
+      Error, /^Callback is not specified$/
+    );
+
+    done();
+  });
+
+  it("should not allow bad experiment names", function (done) {
+    stubDocument();
+
+    session.participate("%%", ["trolled", "not-trolled"], function(err, alt) {
+      assert.equal(alt, null);
+      expect(err).instanceof(Error);
+      done();
+    });
+  });
+
+  it("should not allow bad alternative names", function (done) {
+    stubDocument();
+
+    session.participate("show-bieber", ["trolled"], function(err, alt) {
+      assert.equal(alt, null);
+      expect(err).instanceof(Error);
+
+      session.participate("show-bieber", ["trolled", "%%"], function(err, alt) {
+        assert.equal(alt, null);
+        expect(err).instanceof(Error);
+        done();
+      });
+    });
+  });
 });
