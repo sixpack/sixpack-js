@@ -4,7 +4,9 @@ node_modules
 # Log files
 *.log
 
+# coverage
 .nyc_output
+coverage
 
 *~
 *#*
