@@ -144,11 +144,13 @@ describe('Sixpack Browser Client', () => {
       done();
     });
 
-    it("should not allow bad experiment names", function (done) {
-      session.participate("%%", ["trolled", "not-trolled"], function(err, alt) {
-        assert.equal(alt, null);
-        expect(err).instanceof(Error);
-        done();
+    ['$$', undefined, ''].forEach(function(experiment) {
+      it(`should not allow bad experiment names like "${experiment}"`, function (done) {
+        session.participate(experiment, ["trolled", "not-trolled"], function(err, alt) {
+          assert.equal(alt, null);
+          expect(err).instanceof(Error);
+          done();
+        });
       });
     });
   
