@@ -1,4 +1,3 @@
-
 var EXPERIMENT_REGEX = /^[a-z0-9][a-z0-9\-_ ]*$/;
 
 function get_default_sixpack() {
@@ -16,15 +15,7 @@ function get_default_sixpack() {
   };
 };
 
-function build_participate_params(
-  extra_params,
-  client_id,
-  ip_address,
-  user_agent,
-  traffic_fraction,
-  experiment_name,
-  alternatives,
-){
+function build_participate_params(extra_params, client_id, ip_address, user_agent, traffic_fraction, experiment_name, alternatives) {
   var params = Object.assign({}, extra_params, {
     client_id,
     experiment: experiment_name,
@@ -38,6 +29,24 @@ function build_participate_params(
   }
   if (user_agent) {
     params.user_agent = user_agent;
+  }
+  return params;
+};
+
+function build_convert_params(extra_params, client_id, ip_address, user_agent, experiment_name, kpi) {
+  var params = Object.assign({}, extra_params, {
+    client_id: client_id,
+    experiment: experiment_name
+  });
+
+  if (ip_address) {
+    params.ip_address = ip_address;
+  }
+  if (user_agent) {
+    params.user_agent = user_agent;
+  }
+  if (kpi) {
+    params.kpi = kpi;
   }
   return params;
 };
@@ -89,6 +98,7 @@ function _request_uri(endpoint, params) {
 module.exports = {
   get_default_sixpack,
   build_participate_params,
+  build_convert_params,
   generate_uuidv4,
   is_valid_experiment_name,
   validate_alternatives,

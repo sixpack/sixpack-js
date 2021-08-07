@@ -1,5 +1,6 @@
 var get_default_sixpack = require('./sixpack-commom').get_default_sixpack;
 var build_participate_params = require('./sixpack-commom').build_participate_params;
+var build_convert_params = require('./sixpack-commom').build_convert_params;
 var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
 var is_valid_experiment_name = require('./sixpack-commom').is_valid_experiment_name;
 var validate_alternatives = require('./sixpack-commom').validate_alternatives;
@@ -55,13 +56,7 @@ var _request_uri = require('./sixpack-commom')._request_uri;
       }
 
       var params = build_participate_params(
-        this.extra_params,
-        this.client_id,
-        this.ip_address,
-        this.user_agent,
-        traffic_fraction,
-        experiment_name,
-        alternatives,
+        this.extra_params, this.client_id, this.ip_address, this.user_agent, traffic_fraction, experiment_name, alternatives
       );
 
       return _request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
@@ -89,20 +84,9 @@ var _request_uri = require('./sixpack-commom')._request_uri;
         return callback(new Error("Bad experiment_name"));
       }
 
-      var params = Object.assign({}, this.extra_params, {
-        client_id: this.client_id,
-        experiment: experiment_name
-      });
-
-      if (this.ip_address) {
-        params.ip_address = this.ip_address;
-      }
-      if (this.user_agent) {
-        params.user_agent = this.user_agent;
-      }
-      if (kpi) {
-        params.kpi = kpi;
-      }
+      var params = build_convert_params(
+        this.extra_params, this.client_id, this.ip_address, this.user_agent, experiment_name, kpi
+      );
 
       return _request(this.base_url + "/convert", params, this.timeout, this.cookie, function(err, res) {
         if (err) {
