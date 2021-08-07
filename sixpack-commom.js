@@ -1,4 +1,6 @@
 
+var EXPERIMENT_REGEX = /^[a-z0-9][a-z0-9\-_ ]*$/;
+
 function generate_uuidv4() {
   // from http://stackoverflow.com/questions/105034
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -8,7 +10,7 @@ function generate_uuidv4() {
 }
 
 function is_valid_experiment_name(experiment_name) {
-  return (experiment_name && (/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name));
+  return (experiment_name && (EXPERIMENT_REGEX).test(experiment_name));
 }
 
 function validate_alternatives(alternatives, ignore_alternates_warning) {
@@ -17,7 +19,7 @@ function validate_alternatives(alternatives, ignore_alternates_warning) {
   }
 
   for (var i = 0; i < alternatives.length; i += 1) {
-    if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(alternatives[i])) {
+    if (!(EXPERIMENT_REGEX).test(alternatives[i])) {
       return "Bad alternative name: " + alternatives[i];
     }
   }

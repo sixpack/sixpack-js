@@ -82,11 +82,6 @@ var _request_uri = require('./sixpack-commom')._request_uri;
           return callback(new Error(alternative_error));
         }
 
-        var params = Object.assign({}, this.extra_params, {
-          client_id: this.client_id,
-          experiment: experiment_name,
-          alternatives: alternatives
-        });
         // different thant server lib
         if (force == null) {
           var regex = new RegExp("[\\?&]sixpack-force-" + experiment_name + "=([^&#]*)");
@@ -95,13 +90,19 @@ var _request_uri = require('./sixpack-commom')._request_uri;
             force = decodeURIComponent(results[1].replace(/\+/g, " "));
           }
         }
-        if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
-          params.traffic_fraction = traffic_fraction;
-        }
         if (force != null) {
           return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id, "participating": true});
         }
 
+        var params = Object.assign({}, this.extra_params, {
+          client_id: this.client_id,
+          experiment: experiment_name,
+          alternatives: alternatives
+        });
+
+        if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
+          params.traffic_fraction = traffic_fraction;
+        }
         if (this.ip_address) {
           params.ip_address = this.ip_address;
         }
