@@ -129,9 +129,23 @@ describe('Sixpack Browser Client', () => {
     });
 
     it("should auto generate a client_id", function (done) {
+      session = new window.sixpack.Session({
+        cookie: 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;',
+        cookie_domain: 'jusbrasil.com.br',
+      });
       expect(session.client_id.length).to.equal(36);
       done();
     });
+
+    it("should auto generate a client_id when not persist", function (done) {
+      session = new window.sixpack.Session({
+        cookie: 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;',
+        persist: false,
+      });
+      expect(session.client_id.length).to.equal(36);
+      done();
+    });
+
 
     it("should throw an error when callback is undefined", function (done) {
       session.client_id = "mike";
@@ -193,6 +207,16 @@ describe('Sixpack Browser Client', () => {
             expect(resp.status).to.equal("ok");
             done();
           });
+        });
+      });
+    });
+
+    ['$$', undefined, ''].forEach(function(experiment) {
+      it(`should not allow bad experiment names like "${experiment}"`, function (done) {
+        session.convert(experiment, function(err, alt) {
+          assert.equal(alt, null);
+          expect(err).instanceof(Error);
+          done();
         });
       });
     });
