@@ -22,21 +22,21 @@ var _request_uri = require('./sixpack-commom')._request_uri;
     window.sixpack = sixpack;
 
     sixpack.generate_client_id = function () {
-        var client_id = generate_uuidv4();
-        if (this.persist) {
-            var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
-            if (this.cookie_domain) {
-              cookie_value += '; domain=' + this.cookie_domain;
-            }
-            document.cookie = cookie_value;
+      var client_id = generate_uuidv4();
+      if (this.persist) {
+        var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+        if (this.cookie_domain) {
+          cookie_value += '; domain=' + this.cookie_domain;
         }
-        return client_id;
+        document.cookie = cookie_value;
+      }
+      return client_id;
     };
 
     sixpack.persisted_client_id = function() {
-        // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
-        var result;
-        return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.cookie_name) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
+      // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
+      var result;
+      return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.cookie_name) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
     };
 
     sixpack.Session = function (options) {
@@ -50,7 +50,6 @@ var _request_uri = require('./sixpack-commom')._request_uri;
           this.client_id = this.generate_client_id();
         }
       }
-
       this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
     };
 

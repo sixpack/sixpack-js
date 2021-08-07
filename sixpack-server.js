@@ -32,59 +32,56 @@ var _request_uri = require('./sixpack-commom')._request_uri;
 
   sixpack.Session.prototype = {
     participate: function(experiment_name, alternatives, traffic_fraction, force, callback) {
-        if (typeof traffic_fraction === "function") {
-            callback = traffic_fraction;
-            traffic_fraction = null;
-            force = null;
-        }
-        else if (typeof traffic_fraction === "string") {
-            callback = force;
-            force = traffic_fraction;
-            traffic_fraction = null;
-        }
-        if (typeof force === "function") {
-            callback = force;
-            force = null;
-        }
+      if (typeof traffic_fraction === "function") {
+        callback = traffic_fraction;
+        traffic_fraction = null;
+        force = null;
+      } else if (typeof traffic_fraction === "string") {
+        callback = force;
+        force = traffic_fraction;
+        traffic_fraction = null;
+      }
+      if (typeof force === "function") {
+        callback = force;
+        force = null;
+      }
 
-        if (!callback) {
-          throw new Error("Callback is not specified");
-        }
+      if (!callback) {
+        throw new Error("Callback is not specified");
+      }
 
-        if (!is_valid_experiment_name(experiment_name)) {
-          return callback(new Error("Bad experiment_name"));
-        }
+      if (!is_valid_experiment_name(experiment_name)) {
+        return callback(new Error("Bad experiment_name"));
+      }
 
-        var alternative_error = validate_alternatives(alternatives, this.ignore_alternates_warning);
-        if (alternative_error) {
-          return callback(new Error(alternative_error));
-        }
+      var alternative_error = validate_alternatives(alternatives, this.ignore_alternates_warning);
+      if (alternative_error) {
+        return callback(new Error(alternative_error));
+      }
 
-        var params = Object.assign({}, this.extra_params, {
-            client_id: this.client_id,
-            experiment: experiment_name,
-            alternatives: alternatives
-        });
-        if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
-            params.traffic_fraction = traffic_fraction;
+      var params = Object.assign({}, this.extra_params, {
+        client_id: this.client_id,
+        experiment: experiment_name,
+        alternatives: alternatives
+      });
+      if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
+        params.traffic_fraction = traffic_fraction;
+      }
+      if (force != null) {
+        return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id, "participating": true});
+      }
+      if (this.ip_address) {
+        params.ip_address = this.ip_address;
+      }
+      if (this.user_agent) {
+        params.user_agent = this.user_agent;
+      }
+      return _request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
+        if (err) {
+          res = { status: "failed", error: err, alternative: { name: alternatives[0] } };
         }
-        if (force != null) {
-            return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id, "participating": true});
-        }
-        if (this.ip_address) {
-            params.ip_address = this.ip_address;
-        }
-        if (this.user_agent) {
-            params.user_agent = this.user_agent;
-        }
-        return _request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
-            if (err) {
-                res = {status: "failed",
-                        error: err,
-                        alternative: {name: alternatives[0]}};
-            }
-            return callback(null, res);
-        });
+        return callback(null, res);
+      });
     },
     convert: function(experiment_name, kpi, callback) {
       if (typeof kpi === 'function') {
