@@ -11,6 +11,18 @@ function is_valid_experiment_name(experiment_name) {
   return (experiment_name && (/^[a-z0-9][a-z0-9\-_ ]*$/).test(experiment_name));
 }
 
+function validate_alternatives(alternatives, ignore_alternates_warning) {
+  if (alternatives.length < 2 && ignore_alternates_warning !== true) {
+    return "Must specify at least 2 alternatives";
+  }
+
+  for (var i = 0; i < alternatives.length; i += 1) {
+    if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(alternatives[i])) {
+      return "Bad alternative name: " + alternatives[i];
+    }
+  }
+}
+
 function _request_uri(endpoint, params) {
   var query_string = [];
   var e = encodeURIComponent;
@@ -34,5 +46,6 @@ function _request_uri(endpoint, params) {
 module.exports = {
   generate_uuidv4,
   is_valid_experiment_name,
+  validate_alternatives,
   _request_uri
 }

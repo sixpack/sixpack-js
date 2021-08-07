@@ -1,5 +1,6 @@
 var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
 var is_valid_experiment_name = require('./sixpack-commom').is_valid_experiment_name;
+var validate_alternatives = require('./sixpack-commom').validate_alternatives;
 var _request_uri = require('./sixpack-commom')._request_uri;
 
 (function () {
@@ -47,22 +48,18 @@ var _request_uri = require('./sixpack-commom')._request_uri;
         }
 
         if (!callback) {
-            throw new Error("Callback is not specified");
+          throw new Error("Callback is not specified");
         }
 
         if (!is_valid_experiment_name(experiment_name)) {
           return callback(new Error("Bad experiment_name"));
         }
 
-        if (alternatives.length < 2 && this.ignore_alternates_warning !== true) {
-            return callback(new Error("Must specify at least 2 alternatives"));
+        var alternative_error = validate_alternatives(alternatives, this.ignore_alternates_warning);
+        if (alternative_error) {
+          return callback(new Error(alternative_error));
         }
 
-        for (var i = 0; i < alternatives.length; i += 1) {
-            if (!(/^[a-z0-9][a-z0-9\-_ ]*$/).test(alternatives[i])) {
-                return callback(new Error("Bad alternative name: " + alternatives[i]));
-            }
-        }
         var params = Object.assign({}, this.extra_params, {
             client_id: this.client_id,
             experiment: experiment_name,
