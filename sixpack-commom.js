@@ -1,17 +1,58 @@
 
 var EXPERIMENT_REGEX = /^[a-z0-9][a-z0-9\-_ ]*$/;
 
+function get_default_sixpack() {
+  return {
+    base_url: "http://localhost:5000",
+    extra_params: {},
+    ip_address: null,
+    user_agent: null,
+    timeout: 1000,
+    persist: true,
+    cookie_name: "sixpack_client_id",
+    cookie_domain: null,
+    ignore_alternates_warning: false,
+    cookie: '',
+  };
+};
+
+function build_participate_params(
+  extra_params,
+  client_id,
+  ip_address,
+  user_agent,
+  traffic_fraction,
+  experiment_name,
+  alternatives,
+){
+  var params = Object.assign({}, extra_params, {
+    client_id,
+    experiment: experiment_name,
+    alternatives: alternatives
+  });
+  if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
+    params.traffic_fraction = traffic_fraction;
+  }
+  if (ip_address) {
+    params.ip_address = ip_address;
+  }
+  if (user_agent) {
+    params.user_agent = user_agent;
+  }
+  return params;
+};
+
 function generate_uuidv4() {
   // from http://stackoverflow.com/questions/105034
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
     return v.toString(16);
   });
-}
+};
 
 function is_valid_experiment_name(experiment_name) {
   return (experiment_name && (EXPERIMENT_REGEX).test(experiment_name));
-}
+};
 
 function validate_alternatives(alternatives, ignore_alternates_warning) {
   if (alternatives.length < 2 && ignore_alternates_warning !== true) {
@@ -23,7 +64,7 @@ function validate_alternatives(alternatives, ignore_alternates_warning) {
       return "Bad alternative name: " + alternatives[i];
     }
   }
-}
+};
 
 function _request_uri(endpoint, params) {
   var query_string = [];
@@ -46,6 +87,8 @@ function _request_uri(endpoint, params) {
 };
 
 module.exports = {
+  get_default_sixpack,
+  build_participate_params,
   generate_uuidv4,
   is_valid_experiment_name,
   validate_alternatives,

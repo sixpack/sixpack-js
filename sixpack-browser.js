@@ -1,3 +1,5 @@
+var get_default_sixpack = require('./sixpack-commom').get_default_sixpack;
+var build_participate_params = require('./sixpack-commom').build_participate_params;
 var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
 var is_valid_experiment_name = require('./sixpack-commom').is_valid_experiment_name;
 var validate_alternatives = require('./sixpack-commom').validate_alternatives;
@@ -7,18 +9,7 @@ var _request_uri = require('./sixpack-commom')._request_uri;
     // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
     Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
 
-    var sixpack = window.sixpack ? window.sixpack : {
-        base_url: "http://localhost:5000",
-        extra_params: {},
-        ip_address: null,
-        user_agent: null,
-        timeout: 1000,
-        persist: true,
-        cookie_name: "sixpack_client_id",
-        cookie_domain: null,
-        ignore_alternates_warning: false,
-        cookie: '',
-    };
+    var sixpack = window.sixpack ? window.sixpack : get_default_sixpack();
     window.sixpack = sixpack;
 
     sixpack.generate_client_id = function () {
@@ -94,21 +85,15 @@ var _request_uri = require('./sixpack-commom')._request_uri;
           return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id, "participating": true});
         }
 
-        var params = Object.assign({}, this.extra_params, {
-          client_id: this.client_id,
-          experiment: experiment_name,
-          alternatives: alternatives
-        });
-
-        if (traffic_fraction !== null && !isNaN(traffic_fraction)) {
-          params.traffic_fraction = traffic_fraction;
-        }
-        if (this.ip_address) {
-          params.ip_address = this.ip_address;
-        }
-        if (this.user_agent) {
-          params.user_agent = this.user_agent;
-        }
+        var params = build_participate_params(
+          this.extra_params,
+          this.client_id,
+          this.ip_address,
+          this.user_agent,
+          traffic_fraction,
+          experiment_name,
+          alternatives,
+        );
 
         return _request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
           if (err) {
