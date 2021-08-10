@@ -7,8 +7,8 @@ var { expect, assert } = chai;
 var { stub } = sinon;
 
 const createSixpackInstance = () => {
-  delete require.cache[require.resolve('../sixpack-browser')]
-  return require('../sixpack-browser');
+  delete require.cache[require.resolve('../src/sixpack-browser')]
+  return require('../src/sixpack-browser');
 }
 
 describe('Sixpack Browser Client', () => {

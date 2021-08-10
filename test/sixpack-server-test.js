@@ -3,8 +3,8 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 
 function createSixpackInstance() {
-  delete require.cache[require.resolve('../sixpack-server')]
-  return require('../sixpack-server');
+  delete require.cache[require.resolve('../src/sixpack-server')]
+  return require('../src/sixpack-server');
 }
 
 describe("Sixpack Server Client", function () {
@@ -245,7 +245,7 @@ describe("Sixpack Server Client", function () {
     });
 
     it("should not return ok for convert with new experiment", function (done) {
-      var sixpack = require('../sixpack-server');
+      var sixpack = require('../src/sixpack-server');
       var session = new sixpack.Session({client_id: "mike"});
       session.convert("show-blieber", function(err, resp) {
         // TODO should this be an err?
