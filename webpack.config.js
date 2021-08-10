@@ -6,6 +6,8 @@ const serverConfig = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'sixpack-server.js',
+    libraryTarget: 'umd',
+    globalObject: 'this',
   },
 };
 
@@ -15,6 +17,8 @@ const browserConfig = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'sixpack-browser.js',
+    libraryTarget: 'umd',
+    globalObject: 'this',
   },
   module: {
     rules: [
