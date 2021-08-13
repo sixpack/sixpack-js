@@ -8,9 +8,10 @@
   },
   "scripts": {
     "test": "docker-compose up -d && SIXPACK_BASE_URL=http://localhost:8000 mocha test",
-    "test:coverage": "nyc --reporter=lcov npm run test",
+    "coverage": "nyc --reporter=lcov yarn run test",
     "build:dev": "webpack --mode development --config webpack.config.js",
     "build:prod": "webpack --mode production --config webpack.config.js",
+    "lint": "eslint . --ext .js",
     "clean": "rm -rf dist"
   },
   "repository": {
@@ -27,15 +28,34 @@
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@babel/register": "^7.15.3",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "chai": "4.2.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "husky": "^7.0.1",
     "jsdom": "^16.7.0",
+    "lint-staged": "^11.1.2",
     "mocha": "7.0.1",
     "nock": "13.0.5",
     "nyc": "^15.1.0",
+    "prettier": "^2.3.2",
     "sinon": "^11.1.2",
     "sinon-chai": "^3.7.0",
     "webpack": "^5.49.0",
     "webpack-cli": "^4.7.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "yarn run lint --fix"
+    ]
   }
 }

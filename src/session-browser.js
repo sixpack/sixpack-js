@@ -1,32 +1,41 @@
-import Session from "./session";
+/* eslint-disable no-console */
+/* eslint-disable func-names */
+/* eslint-disable no-param-reassign */
+import Session from './session';
 
 export default class SessionBrowser extends Session {
   constructor(props) {
-    super(props)
+    super(props);
     this.generateUuidv4 = props.generateUuidv4;
   }
 
-  participate = (experimentName, alternatives, trafficFraction, force, callback) => {
-    if (typeof trafficFraction === "function") {
+  participate = (
+    experimentName,
+    alternatives,
+    trafficFraction,
+    force,
+    callback,
+  ) => {
+    if (typeof trafficFraction === 'function') {
       callback = trafficFraction;
       trafficFraction = null;
       force = null;
-    } else if (typeof trafficFraction === "string") {
+    } else if (typeof trafficFraction === 'string') {
       callback = force;
       force = trafficFraction;
       trafficFraction = null;
     }
-    if (typeof force === "function") {
+    if (typeof force === 'function') {
       callback = force;
       force = null;
     }
 
     if (!callback) {
-      throw new Error("Callback is not specified");
+      throw new Error('Callback is not specified');
     }
 
     if (!this.isValidExperimentName(experimentName)) {
-      return callback(new Error("Bad experiment_name"));
+      return callback(new Error('Bad experiment_name'));
     }
 
     const alternativeError = this.validateAlternatives(alternatives);
@@ -35,10 +44,12 @@ export default class SessionBrowser extends Session {
     }
 
     if (force == null) {
-      const regex = new RegExp("[\\?&]sixpack-force-" + experimentName + "=([^&#]*)");
+      const regex = new RegExp(
+        `[\\?&]sixpack-force-${experimentName}=([^&#]*)`,
+      );
       const results = regex.exec(window.location.search);
-      if(results != null) {
-        force = decodeURIComponent(results[1].replace(/\+/g, " "));
+      if (results != null) {
+        force = decodeURIComponent(results[1].replace(/\+/g, ' '));
       }
     }
     if (force != null) {
@@ -46,16 +57,27 @@ export default class SessionBrowser extends Session {
     }
 
     const params = this.buildParticipateParams({
-      trafficFraction, experimentName, alternatives
+      trafficFraction,
+      experimentName,
+      alternatives,
     });
 
-    return this.request(this.base_url + "/participate", params, this.timeout, function(err, res) {
-      if (err) {
-        res = { status: "failed", error: err, alternative: { name: alternatives[0]} };
-      }
-      return callback(null, res);
-    });
-  }
+    return this.request(
+      `${this.base_url}/participate`,
+      params,
+      this.timeout,
+      function (err, res) {
+        if (err) {
+          res = {
+            status: 'failed',
+            error: err,
+            alternative: { name: alternatives[0] },
+          };
+        }
+        return callback(null, res);
+      },
+    );
+  };
 
   convert = (experimentName, kpi, callback) => {
     if (typeof kpi === 'function') {
@@ -64,44 +86,50 @@ export default class SessionBrowser extends Session {
     }
 
     if (!callback) {
-      callback = function(err) {
+      callback = function (err) {
         if (err && console && console.error) {
           console.error(err);
         }
-      }
+      };
     }
 
     if (!this.isValidExperimentName(experimentName)) {
-      return callback(new Error("Bad experiment_name"));
+      return callback(new Error('Bad experiment_name'));
     }
 
     const params = this.buildConvertParams({ experimentName, kpi });
 
-    return this.request(this.base_url + "/convert", params, this.timeout, function(err, res) {
-      if (err) {
-        res = { status: "failed", error: err };
-      }
-      return callback(null, res);
-    });
-  }
+    return this.request(
+      `${this.base_url}/convert`,
+      params,
+      this.timeout,
+      function (err, res) {
+        if (err) {
+          res = { status: 'failed', error: err };
+        }
+        return callback(null, res);
+      },
+    );
+  };
 
   request = (uri, params, timeout, callback) => {
     let timedOut = false;
     const timeoutHandle = setTimeout(function () {
       timedOut = true;
-      return callback(new Error("request timed out"));
+      return callback(new Error('request timed out'));
     }, timeout);
 
     const suffix = this.generateUuidv4().replace(/-/g, '');
-    const cb = "callback" + suffix;
-    params.callback = "sixpack." + cb;
+    const cb = `callback${suffix}`;
+    params.callback = `sixpack.${cb}`;
 
+    // eslint-disable-next-line consistent-return
     window.sixpack[cb] = function (res) {
       if (!timedOut) {
         clearTimeout(timeoutHandle);
         return callback(null, res);
       }
-    }
+    };
 
     const url = this.requestUri(uri, params);
     const script = document.createElement('script');
@@ -109,5 +137,5 @@ export default class SessionBrowser extends Session {
     script.src = url;
     script.async = true;
     document.body.appendChild(script);
-  }
+  };
 }

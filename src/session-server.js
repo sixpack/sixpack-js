@@ -1,31 +1,36 @@
-import Session from "./session";
+/* eslint-disable no-console */
+/* eslint-disable func-names */
+/* eslint-disable no-param-reassign */
+import Session from './session';
 
 export default class SessionServer extends Session {
-  constructor(props) {
-    super(props)
-  }
-
-  participate = (experimentName, alternatives, trafficFraction, force, callback) => {
-    if (typeof trafficFraction === "function") {
+  participate = (
+    experimentName,
+    alternatives,
+    trafficFraction,
+    force,
+    callback,
+  ) => {
+    if (typeof trafficFraction === 'function') {
       callback = trafficFraction;
       trafficFraction = null;
       force = null;
-    } else if (typeof trafficFraction === "string") {
+    } else if (typeof trafficFraction === 'string') {
       callback = force;
       force = trafficFraction;
       trafficFraction = null;
     }
-    if (typeof force === "function") {
+    if (typeof force === 'function') {
       callback = force;
       force = null;
     }
 
     if (!callback) {
-      throw new Error("Callback is not specified");
+      throw new Error('Callback is not specified');
     }
 
     if (!this.isValidExperimentName(experimentName)) {
-      return callback(new Error("Bad experiment_name"));
+      return callback(new Error('Bad experiment_name'));
     }
 
     const alternativeError = this.validateAlternatives(alternatives);
@@ -38,16 +43,28 @@ export default class SessionServer extends Session {
     }
 
     const params = this.buildParticipateParams({
-      trafficFraction, experimentName, alternatives
+      trafficFraction,
+      experimentName,
+      alternatives,
     });
 
-    return this.request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
-      if (err) {
-        res = { status: "failed", error: err, alternative: { name: alternatives[0] } };
-      }
-      return callback(null, res);
-    });
-  }
+    return this.request(
+      `${this.base_url}/participate`,
+      params,
+      this.timeout,
+      this.cookie,
+      function (err, res) {
+        if (err) {
+          res = {
+            status: 'failed',
+            error: err,
+            alternative: { name: alternatives[0] },
+          };
+        }
+        return callback(null, res);
+      },
+    );
+  };
 
   convert = (experimentName, kpi, callback) => {
     if (typeof kpi === 'function') {
@@ -56,36 +73,43 @@ export default class SessionServer extends Session {
     }
 
     if (!callback) {
-      callback = function(err) {
+      callback = function (err) {
         if (err && console && console.error) {
           console.error(err);
         }
-      }
+      };
     }
 
     if (!this.isValidExperimentName(experimentName)) {
-      return callback(new Error("Bad experiment_name"));
+      return callback(new Error('Bad experiment_name'));
     }
 
     const params = this.buildConvertParams({ experimentName, kpi });
 
-    return this.request(this.base_url + "/convert", params, this.timeout, this.cookie, function(err, res) {
-      if (err) {
-        res = { status: "failed", error: err };
-      }
-      return callback(null, res);
-    });
-  }
+    return this.request(
+      `${this.base_url}/convert`,
+      params,
+      this.timeout,
+      this.cookie,
+      function (err, res) {
+        if (err) {
+          res = { status: 'failed', error: err };
+        }
+        return callback(null, res);
+      },
+    );
+  };
 
   request = (uri, params, timeout, cookie, callback) => {
     let timedOut = false;
     const timeoutHandle = setTimeout(function () {
       timedOut = true;
-      return callback(new Error("request timed out"));
+      return callback(new Error('request timed out'));
     }, timeout);
 
     const url = this.requestUri(uri, params);
     const httpModule = url.startsWith('https') ? 'https' : 'http';
+    // eslint-disable-next-line no-eval
     const http = eval('require')(httpModule); // using eval to skip webpack bundling and warnings
 
     const parsedUrl = new URL(url);
@@ -93,17 +117,19 @@ export default class SessionServer extends Session {
       protocol: parsedUrl.protocol,
       port: parsedUrl.port,
       hostname: parsedUrl.hostname,
-      path: parsedUrl.pathname + parsedUrl.search, 
-      headers: { Cookie: cookie }
-    }
+      path: parsedUrl.pathname + parsedUrl.search,
+      headers: { Cookie: cookie },
+    };
 
-    const req = http.get(options, function(res) {
-      let body = "";
-      res.on('data', function(chunk) {
-        return body += chunk;
+    const req = http.get(options, function (res) {
+      let body = '';
+      res.on('data', function (chunk) {
+        // eslint-disable-next-line no-return-assign
+        return (body += chunk);
       });
 
-      return res.on('end', function() {
+      // eslint-disable-next-line consistent-return
+      return res.on('end', function () {
         let data = { status: 'failed', response: body };
 
         if (res.statusCode < 500) {
@@ -121,11 +147,12 @@ export default class SessionServer extends Session {
       });
     });
 
-    req.on('error', function(err) {
+    // eslint-disable-next-line consistent-return
+    req.on('error', function (err) {
       if (!timedOut) {
         clearTimeout(timeoutHandle);
         return callback(err);
       }
     });
-  }
+  };
 }
