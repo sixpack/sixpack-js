@@ -7,7 +7,7 @@ Node / browser client library for SeatGeek's [Sixpack](https://github.com/seatge
 Include the "sixpack.js" script. The `sixpack` object will be added to your environment. In the browser do the following:
 
 ``` html
-<script src='sixpack.js'></script>
+<script src="sixpack-browser.js" type="text/javascript"></script>
 ```
 
 If you're using sixpack-client with node.js start by installing it with [npm](https://www.npmjs.com):
@@ -19,7 +19,7 @@ npm install sixpack-client
 then require the "sixpack-client" module:
 
 ``` javascript
-var sixpack = require('sixpack-client');
+const { sixpack } = require('sixpack-server');
 ```
 
 ## Usage
@@ -27,9 +27,9 @@ var sixpack = require('sixpack-client');
 Check out the examples in the `examples` directory for some quick examples for how to use the library. Here's a very basic example in node:
 
 ```js
-var sixpack = require('sixpack-client');
+const { sixpack } = require('sixpack-server');
 
-var session = new sixpack.Session();
+var session = sixpack.Session();
 session.participate('test-exp', ['alt-one', 'alt-two'], function (err, res) {
   if (err) throw err;
   alt = res.alternative.name
@@ -44,11 +44,11 @@ session.participate('test-exp', ['alt-one', 'alt-two'], function (err, res) {
 When instantiating the session object you can pass optional params `client_id`, `base_url`, `ip_address`, `user_agent`
 
 ```js
-var sixpack = new sixpack.Session({
-    client_id: 12345,
-    base_url: 'http://google.com/sixpack',
-    ip_address: '1.2.2.1',
-    user_agent: 'ChromeBot'
+var sixpack = sixpack.Session({
+  client_id: 12345,
+  base_url: 'http://google.com/sixpack',
+  ip_address: '1.2.2.1',
+  user_agent: 'ChromeBot'
 });
 ```
 
