@@ -6,6 +6,11 @@ var session = sixpack.Session({
 
 session.participate("test-exp", ["alt-one", "alt-two"], function (err, res) {
   if (err) return console.log(err);
-  console.log(res);
+  console.log("participate: ", res);
+
+  session.convert("test-exp", function (err, res) {
+    if (err) return console.log(err);
+    console.log("convert: ", res);
+  });
 });
 
