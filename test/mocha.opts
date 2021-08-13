@@ -1,0 +1,4 @@
+--globals document,window
+--require @babel/register
+--require test/setup
+--recursive

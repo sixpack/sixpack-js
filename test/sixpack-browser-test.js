@@ -1,21 +1,21 @@
-var chai = require('chai');
-var sinon = require('sinon');
-var jsdom = require("jsdom");
+import { describe, it, beforeEach } from 'mocha';
+import { expect, assert } from 'chai';
+import { stub } from 'sinon';
+import { JSDOM } from 'jsdom';
+import { sixpack } from '../src/sixpack-browser';
 
-chai.use(require('sinon-chai'));
-var { expect, assert } = chai;
-var { stub } = sinon;
-
-const createSixpackInstance = () => {
-  delete require.cache[require.resolve('../src/sixpack-browser')]
-  return require('../src/sixpack-browser');
-}
+const createSession = (props) => 
+  sixpack.Session({
+    base_url:  process.env.SIXPACK_BASE_URL,
+    ...props,
+  });
 
 describe('Sixpack Browser Client', () => {
-  var session
+  const cookie = 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;';
+  let session;
 
   beforeEach(() => {
-    var dom = new jsdom.JSDOM('<!DOCTYPE html><html><head></head><body></body></html>', {
+    let dom = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>', {
       url: "file://.",
       runScripts: "dangerously",
       resources: "usable"
@@ -23,14 +23,9 @@ describe('Sixpack Browser Client', () => {
     global.window = dom.window;
     global.document = dom.window.document;
 
-    createSixpackInstance();
-    session = new window.sixpack.Session({
-      cookie: 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;'
-    });
+    window.sixpack = sixpack;
 
-    if (process.env.SIXPACK_BASE_URL) {
-      session.base_url = process.env.SIXPACK_BASE_URL;
-    }
+    session = createSession({ cookie });
   });
 
   afterEach(() => {
@@ -39,16 +34,12 @@ describe('Sixpack Browser Client', () => {
   });
 
   it('should create sixpack instance in browser', function () {
-    global.window = {};
-    expect(window.sixpack).to.be.undefined;
-    createSixpackInstance();
     expect(window.sixpack).to.be.an('object');
   });
 
   it('should not create another sixpack instance if exists in browser', function () {
     var globalSixpack = {};
     global.window = { sixpack: globalSixpack };
-    createSixpackInstance();
 
     expect(window.sixpack).to.be.equal(globalSixpack);
   });
@@ -130,8 +121,8 @@ describe('Sixpack Browser Client', () => {
 
     it("should auto generate a client_id", function (done) {
       session = new window.sixpack.Session({
-        cookie: 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;',
         cookie_domain: 'jusbrasil.com.br',
+        cookie,
       });
       expect(session.client_id.length).to.equal(36);
       done();
@@ -139,13 +130,19 @@ describe('Sixpack Browser Client', () => {
 
     it("should auto generate a client_id when not persist", function (done) {
       session = new window.sixpack.Session({
-        cookie: 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;',
         persist: false,
+        cookie,
       });
       expect(session.client_id.length).to.equal(36);
       done();
     });
 
+    it("should use external client_id", function (done) {
+      const id = 'test';
+      session = createSession({ client_id: id })
+      expect(session.client_id).to.equal(id);
+      done();
+    });
 
     it("should throw an error when callback is undefined", function (done) {
       session.client_id = "mike";
@@ -184,12 +181,14 @@ describe('Sixpack Browser Client', () => {
 
   describe('.convert', () => {
     it("should return ok for convert", function (done) {
-      session.client_id = "mike";
+      const id = "mike";
+      session.client_id = id;
       session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
         if (err) throw err;
         session.convert("show-bieber", function(err, resp) {
           if (err) throw err;
           expect(resp.status).to.equal("ok");
+          expect(resp.client_id).to.equal(id);
           done();
         });
       });

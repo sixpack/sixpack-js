@@ -1,156 +1,54 @@
-var get_default_sixpack = require('./sixpack-commom').get_default_sixpack;
-var build_participate_params = require('./sixpack-commom').build_participate_params;
-var build_convert_params = require('./sixpack-commom').build_convert_params;
-var generate_uuidv4 = require('./sixpack-commom').generate_uuidv4;
-var is_valid_experiment_name = require('./sixpack-commom').is_valid_experiment_name;
-var validate_alternatives = require('./sixpack-commom').validate_alternatives;
-var _request_uri = require('./sixpack-commom')._request_uri;
+import Sixpack from "./sixpack";
+import SessionBrowser from "./session-browser";
 
-(function () {
-    // Object.assign polyfill from https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
-    Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:function(e){"use strict";if(void 0===e||null===e)throw new TypeError("Cannot convert first argument to object");for(var r=Object(e),t=1;t<arguments.length;t++){var n=arguments[t];if(void 0!==n&&null!==n){n=Object(n);for(var o=Object.keys(Object(n)),a=0,c=o.length;c>a;a++){var i=o[a],b=Object.getOwnPropertyDescriptor(n,i);void 0!==b&&b.enumerable&&(r[i]=n[i])}}}return r}});
+class SixpackBrowser extends Sixpack {
+  constructor(){
+    super();
+  }
 
-    var sixpack = window.sixpack ? window.sixpack : get_default_sixpack();
-    window.sixpack = sixpack;
+  Session = (options) => {
+    this.updateProperties(options)
 
-    sixpack.generate_client_id = function () {
-      var client_id = generate_uuidv4();
+    if (!this.client_id) {
       if (this.persist) {
-        var cookie_value = this.cookie_name + "=" + client_id + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
-        if (this.cookie_domain) {
-          cookie_value += '; domain=' + this.cookie_domain;
-        }
-        document.cookie = cookie_value;
+        const persistedId = this.persistedClientId();
+        this.client_id = persistedId !== null ? persistedId : this.generateClientId();
+      } else {
+        this.client_id = this.generateClientId();
       }
-      return client_id;
-    };
+    }
 
-    sixpack.persisted_client_id = function() {
-      // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
-      var result;
-      return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.cookie_name) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
-    };
+    this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
 
-    sixpack.Session = function (options) {
-      Object.assign(this, sixpack, options);
+    return new SessionBrowser({
+      base_url: this.base_url,
+      timeout: this.timeout,
+      cookie: this.cookie,
+      extra_params: this.extra_params,
+      client_id: this.client_id,
+      ip_address: this.ip_address,
+      user_agent: this.user_agent,
+      generateUuidv4: this.generateUuidv4
+    });
+  }
 
-      if (!this.client_id) {
-        if (this.persist) {
-          var persisted_id = this.persisted_client_id();
-          this.client_id = persisted_id !== null ? persisted_id : this.generate_client_id();
-        } else {
-          this.client_id = this.generate_client_id();
-        }
+  persistedClientId = () => {
+    // http://stackoverflow.com/questions/5639346/shortest-function-for-reading-a-cookie-in-javascript
+    let result;
+    return (result = new RegExp('(?:^|; )' + encodeURIComponent(this.cookie_name) + '=([^;]*)').exec(document.cookie)) ? (result[1]) : null;
+  };
+
+  generateClientId = () => {
+    const clientId = this.generateUuidv4();
+    if (this.persist) {
+      var cookieValue = this.cookie_name + "=" + clientId + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+      if (this.cookie_domain) {
+        cookieValue += '; domain=' + this.cookie_domain;
       }
-      this.user_agent = this.user_agent || (window && window.navigator && window.navigator.userAgent);
-    };
+      document.cookie = cookieValue;
+    }
+    return clientId;
+  }
+}
 
-    sixpack.Session.prototype = {
-      participate: function(experiment_name, alternatives, traffic_fraction, force, callback) {
-        if (typeof traffic_fraction === "function") {
-          callback = traffic_fraction;
-          traffic_fraction = null;
-          force = null;
-        } else if (typeof traffic_fraction === "string") {
-          callback = force;
-          force = traffic_fraction;
-          traffic_fraction = null;
-        }
-        if (typeof force === "function") {
-          callback = force;
-          force = null;
-        }
-
-        if (!callback) {
-          throw new Error("Callback is not specified");
-        }
-
-        if (!is_valid_experiment_name(experiment_name)) {
-          return callback(new Error("Bad experiment_name"));
-        }
-
-        var alternative_error = validate_alternatives(alternatives, this.ignore_alternates_warning);
-        if (alternative_error) {
-          return callback(new Error(alternative_error));
-        }
-
-        // different thant server lib
-        if (force == null) {
-          var regex = new RegExp("[\\?&]sixpack-force-" + experiment_name + "=([^&#]*)");
-          var results = regex.exec(window.location.search);
-          if(results != null) {
-            force = decodeURIComponent(results[1].replace(/\+/g, " "));
-          }
-        }
-        if (force != null) {
-          return callback(null, {"status": "ok", "alternative": {"name": force}, "experiment": {"version": 0, "name": experiment_name}, "client_id": this.client_id, "participating": true});
-        }
-
-        var params = build_participate_params(
-          this.extra_params, this.client_id, this.ip_address, this.user_agent, traffic_fraction, experiment_name, alternatives
-        );
-
-        return _request(this.base_url + "/participate", params, this.timeout, this.cookie, function(err, res) {
-          if (err) {
-            res = { status: "failed", error: err, alternative: { name: alternatives[0]} };
-          }
-          return callback(null, res);
-        });
-      },
-      convert: function(experiment_name, kpi, callback) {
-        if (typeof kpi === 'function') {
-          callback = kpi;
-          kpi = null;
-        }
-  
-        if (!callback) {
-          callback = function(err) {
-            if (err && console && console.error) {
-              console.error(err);
-            }
-          }
-        }
-
-        if (!is_valid_experiment_name(experiment_name)) {
-          return callback(new Error("Bad experiment_name"));
-        }
-
-        var params = build_convert_params(
-          this.extra_params, this.client_id, this.ip_address, this.user_agent, experiment_name, kpi
-        );
-
-        return _request(this.base_url + "/convert", params, this.timeout, this.cookie, function(err, res) {
-          if (err) {
-            res = { status: "failed", error: err };
-          }
-          return callback(null, res);
-        });
-      }
-    };
-
-    var _request = function(uri, params, timeout, cookie, callback) {
-      var timed_out = false;
-      var timeout_handle = setTimeout(function () {
-        timed_out = true;
-        return callback(new Error("request timed out"));
-      }, timeout);
-
-      var suffix = generate_uuidv4().replace(/-/g, '');
-      var cb = "callback" + suffix;
-      params.callback = "sixpack." + cb;
-
-      sixpack[cb] = function (res) {
-        if (!timed_out) {
-          clearTimeout(timeout_handle);
-          return callback(null, res);
-        }
-      }
-
-      var url = _request_uri(uri, params);
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = url;
-      script.async = true;
-      document.body.appendChild(script);
-    };
-})();
+export const sixpack = new SixpackBrowser();

@@ -7,10 +7,8 @@
     "node": ">=14"
   },
   "scripts": {
-    "test": "docker-compose up -d && SIXPACK_BASE_URL=http://localhost:8000 yarn test:mocha",
-    "test:mocha": "mocha --globals document,window",
-    "test:coverage": "nyc npm run test",
-    "test:lcov": "nyc --reporter=lcov npm run test",
+    "test": "docker-compose up -d && SIXPACK_BASE_URL=http://localhost:8000 mocha test",
+    "test:coverage": "nyc --reporter=lcov npm run test",
     "build:dev": "webpack --mode development --config webpack.config.js",
     "build:prod": "webpack --mode production --config webpack.config.js",
     "clean": "rm -rf dist"
@@ -28,6 +26,7 @@
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
+    "@babel/register": "^7.15.3",
     "babel-loader": "^8.2.2",
     "chai": "4.2.0",
     "jsdom": "^16.7.0",

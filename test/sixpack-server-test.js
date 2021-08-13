@@ -1,28 +1,20 @@
-var nock = require('nock');
-var assert = require('chai').assert;
-var expect = require('chai').expect;
+import { describe, it, beforeEach } from 'mocha';
+import { expect, assert } from 'chai';
+import { sixpack } from '../src/sixpack-server';
+import nock from 'nock';
 
-function createSixpackInstance() {
-  delete require.cache[require.resolve('../src/sixpack-server')]
-  return require('../src/sixpack-server');
-}
+const createSession = (props) => 
+  sixpack.Session({
+    base_url:  process.env.SIXPACK_BASE_URL,
+    ...props,
+  });
 
 describe("Sixpack Server Client", function () {
-  var sixpack;
-  var session;
+  const cookie = 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;';
+  let session;
 
   beforeEach( () => {
-    sixpack = createSixpackInstance();
-    session = new sixpack.Session({
-      cookie: 'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;'
-    });
-
-    // Override default base_url when the SIXPACK_BASE_URL
-    // environment variable is found.
-    if (process.env.SIXPACK_BASE_URL) {
-      session.base_url = process.env.SIXPACK_BASE_URL;
-    }
-
+    session = createSession({ cookie });
     nock.cleanAll();
   });
 
@@ -38,9 +30,7 @@ describe("Sixpack Server Client", function () {
       }
       session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
         if (err) throw err;
-        expect(receivedHeaders['Cookie']).to.equal(
-          'user="NDIwNjkxNzE=|4321|s1gn3d"; jdid=s0m3-f4ncy-d3vic3-1d;'
-        );
+        expect(receivedHeaders['Cookie']).to.equal(cookie);
         done();
       });
     } finally {
@@ -50,6 +40,13 @@ describe("Sixpack Server Client", function () {
 
   it("should auto generate a client_id", function (done) {
     expect(session.client_id.length).to.equal(36);
+    done();
+  });
+
+  it("should use external client_id", function (done) {
+    const id = 'test';
+    session = createSession({ client_id: id })
+    expect(session.client_id).to.equal(id);
     done();
   });
 
@@ -208,12 +205,14 @@ describe("Sixpack Server Client", function () {
 
   describe('.convert', function () {
     it("should return ok for convert", function (done) {
-      session.client_id = "mike";
+      const id = "mike";
+      session.client_id = id;
       session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
         if (err) throw err;
         session.convert("show-bieber", function(err, resp) {
           if (err) throw err;
           expect(resp.status).to.equal("ok");
+          expect(resp.client_id).to.equal(id);
           done();
         });
       });
@@ -245,8 +244,7 @@ describe("Sixpack Server Client", function () {
     });
 
     it("should not return ok for convert with new experiment", function (done) {
-      var sixpack = require('../src/sixpack-server');
-      var session = new sixpack.Session({client_id: "mike"});
+      session = createSession({ client_id: "mike" });
       session.convert("show-blieber", function(err, resp) {
         // TODO should this be an err?
         if (err) throw err;
@@ -273,7 +271,7 @@ describe("Sixpack Server Client", function () {
           if (err) throw err;
           var alt1 = res.alternative.name;
           var old_id = session.client_id;
-          session.client_id = sixpack.generate_client_id();
+          session.client_id = sixpack.generateClientId();
   
           session.convert("testing", function(err, res) {
             if (err) throw err;
