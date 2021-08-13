@@ -83,7 +83,6 @@ export default class Session {
   requestUri = (endpoint, params) => {
     const queryString = [];
     const e = encodeURIComponent;
-    // eslint-disable-next-line no-restricted-syntax
     for (const key in params) {
       // eslint-disable-next-line no-prototype-builtins
       if (params.hasOwnProperty(key)) {
