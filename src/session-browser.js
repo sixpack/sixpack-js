@@ -29,14 +29,14 @@ export default class SessionBrowser extends Session {
       return callback(new Error("Bad experiment_name"));
     }
 
-    var alternativeError = this.validateAlternatives(alternatives);
+    const alternativeError = this.validateAlternatives(alternatives);
     if (alternativeError) {
       return callback(new Error(alternativeError));
     }
 
     if (force == null) {
-      var regex = new RegExp("[\\?&]sixpack-force-" + experimentName + "=([^&#]*)");
-      var results = regex.exec(window.location.search);
+      const regex = new RegExp("[\\?&]sixpack-force-" + experimentName + "=([^&#]*)");
+      const results = regex.exec(window.location.search);
       if(results != null) {
         force = decodeURIComponent(results[1].replace(/\+/g, " "));
       }
@@ -92,8 +92,8 @@ export default class SessionBrowser extends Session {
       return callback(new Error("request timed out"));
     }, timeout);
 
-    var suffix = this.generateUuidv4().replace(/-/g, '');
-    var cb = "callback" + suffix;
+    const suffix = this.generateUuidv4().replace(/-/g, '');
+    const cb = "callback" + suffix;
     params.callback = "sixpack." + cb;
 
     window.sixpack[cb] = function (res) {
@@ -103,8 +103,8 @@ export default class SessionBrowser extends Session {
       }
     }
 
-    var url = this.requestUri(uri, params);
-    var script = document.createElement('script');
+    const url = this.requestUri(uri, params);
+    const script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = url;
     script.async = true;

@@ -28,7 +28,7 @@ export default class SessionServer extends Session {
       return callback(new Error("Bad experiment_name"));
     }
 
-    var alternativeError = this.validateAlternatives(alternatives);
+    const alternativeError = this.validateAlternatives(alternatives);
     if (alternativeError) {
       return callback(new Error(alternativeError));
     }
@@ -78,15 +78,15 @@ export default class SessionServer extends Session {
   }
 
   request = (uri, params, timeout, cookie, callback) => {
-    var timedOut = false;
-    var timeoutHandle = setTimeout(function () {
+    let timedOut = false;
+    const timeoutHandle = setTimeout(function () {
       timedOut = true;
       return callback(new Error("request timed out"));
     }, timeout);
 
-    var url = this.requestUri(uri, params);
-    var httpModule = url.startsWith('https') ? 'https' : 'http';
-    var http = eval('require')(httpModule); // using eval to skip webpack bundling and warnings
+    const url = this.requestUri(uri, params);
+    const httpModule = url.startsWith('https') ? 'https' : 'http';
+    const http = eval('require')(httpModule); // using eval to skip webpack bundling and warnings
 
     const parsedUrl = new URL(url);
     const options = {

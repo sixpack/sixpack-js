@@ -38,7 +38,7 @@ describe('Sixpack Browser Client', () => {
   });
 
   it('should not create another sixpack instance if exists in browser', function () {
-    var globalSixpack = {};
+    const globalSixpack = {};
     global.window = { sixpack: globalSixpack };
 
     expect(window.sixpack).to.be.equal(globalSixpack);
@@ -49,11 +49,11 @@ describe('Sixpack Browser Client', () => {
   })
 
   it("should create script and append in body", function (done) {
-    var http = require('http');
-    var originalGet = http.get;
-    var script = {};
-    var appendChild = stub();
-    var createElement = stub().returns(script)
+    let http = require('http');
+    const originalGet = http.get;
+    const script = {};
+    const appendChild = stub();
+    const createElement = stub().returns(script)
 
     window.location = {};
     document.body = document.body || {};

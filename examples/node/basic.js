@@ -1,6 +1,6 @@
-var { sixpack } = require('../../dist/sixpack-server');
+const { sixpack } = require('../../dist/sixpack-server');
 
-var session = sixpack.Session({
+const session = sixpack.Session({
   base_url: "http://localhost:8000",
 });
 

@@ -41,7 +41,7 @@ class SixpackBrowser extends Sixpack {
   generateClientId = () => {
     const clientId = this.generateUuidv4();
     if (this.persist) {
-      var cookieValue = this.cookie_name + "=" + clientId + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+      let cookieValue = this.cookie_name + "=" + clientId + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
       if (this.cookie_domain) {
         cookieValue += '; domain=' + this.cookie_domain;
       }

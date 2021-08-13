@@ -59,7 +59,7 @@ export default class Session {
       return "Must specify at least 2 alternatives";
     }
 
-    for (var i = 0; i < alternatives.length; i += 1) {
+    for (let i = 0; i < alternatives.length; i += 1) {
       if (!(EXPERIMENT_REGEX).test(alternatives[i])) {
         return "Bad alternative name: " + alternatives[i];
       }
@@ -75,7 +75,7 @@ export default class Session {
         if (Object.prototype.toString.call(vals) !== '[object Array]') {
             vals = [vals];
         }
-        for (var i = 0; i < vals.length; i += 1) {
+        for (let i = 0; i < vals.length; i += 1) {
           queryString.push(e(key) + '=' + e(vals[i]));
         }
       }

@@ -19,9 +19,9 @@ describe("Sixpack Server Client", function () {
   });
 
   it("should forward 'Cookie' header", function (done) {
-    var http = require('http');
-    var originalGet = http.get;
-    var receivedHeaders;
+    let http = require('http');
+    const originalGet = http.get;
+    let receivedHeaders;
 
     try {
       http.get = (options, callback) => {
@@ -60,7 +60,7 @@ describe("Sixpack Server Client", function () {
     });
 
     it("should return error body in status code 500", function (done) {
-      var body = "Internal Server Error";
+      const body = "Internal Server Error";
       nock(session.base_url).get(/\/participate/).reply(500, body);
       session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
         if (err) throw err;
@@ -71,7 +71,7 @@ describe("Sixpack Server Client", function () {
     });
 
     it("should return error body in status code greater than 500", function (done) {
-      var body = "Bad Gateway";
+      const body = "Bad Gateway";
       nock(session.base_url).get(/\/participate/).reply(502, body);
       session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
         if (err) throw err;
@@ -82,7 +82,7 @@ describe("Sixpack Server Client", function () {
     });
 
     it("should return error body in malformed JSON response", function (done) {
-      var body = "definitely not a JSON";
+      const body = "definitely not a JSON";
       nock(session.base_url).get(/\/participate/).reply(200, body);
       session.participate("show-bieber", ["trolled", "not-trolled"], function(err, resp) {
         if (err) throw err;
@@ -269,8 +269,8 @@ describe("Sixpack Server Client", function () {
   
         session.participate("testing", ["one", "two"], function(err, res) {
           if (err) throw err;
-          var alt1 = res.alternative.name;
-          var old_id = session.client_id;
+          const alt1 = res.alternative.name;
+          const old_id = session.client_id;
           session.client_id = sixpack.generateClientId();
   
           session.convert("testing", function(err, res) {
